@@ -1,0 +1,48 @@
+/* NavBar container should be positioned at the bottom */
+.navbar {
+  position: fixed; /* Fixes the navbar at the bottom */
+  bottom: 0; /* Aligns it to the bottom of the viewport */
+  left: 0; /* Aligns it to the left edge of the viewport */
+  width: 100%; /* Full width of the viewport */
+  background-color: var(--sg-sys-color-surface); /* Background color */
+  display: flex;
+  align-items: center; /* Center items vertically */
+  justify-content: space-around; /* Space items evenly */
+  padding: 0 16px; /* Padding on left and right */
+  box-sizing: border-box; /* Include padding in width calculation */
+  z-index: 1000; /* Ensure it stays above other content */
+  height: 56px; /* Set a fixed height */
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for better visibility */
+  /* Optional: Add bottom border to ensure it's always visible */
+  border-top: 1px solid #ddd;
+}
+
+
+/* Nav items container styles */
+.navitem {
+  height: 100%; /* Fill the height of the navbar */
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.3s; /* Smooth hover effect */
+}
+
+/* Icon styles */
+.navitem i {
+  width: 24px; /* Adjust size to fit Bootstrap icon */
+  height: 24px;
+}
+
+/* Hover effects (optional) */
+.navitem:hover {
+  opacity: 0.7; /* Example hover effect */
+}
+
+/* Adjust navbar padding for smaller screens */
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 8px; /* Adjust padding for smaller screens */
+  }
+}

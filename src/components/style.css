@@ -1,0 +1,40 @@
+
+.splash-screen {
+    align-items: center;
+    /* background: radial-gradient(
+        50% 50% at 50% 50%,
+        rgb(146.28, 232.2, 250.67) 0%,
+        rgb(222, 80, 144) 52%,
+        rgb(251.38, 164.27, 176.77) 100%
+    ); */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 800px;
+    justify-content: center;
+    padding: 363px 96px;
+    position: relative;
+}
+
+.splash-screen .text-wrapper {
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+    background: linear-gradient(
+        180deg,
+        rgb(46, 153, 176) 10%,
+        rgb(248.98, 108.87, 181.24) 50.1%,
+        rgb(249.71, 131.94, 148.85) 100%
+    );
+    background-clip: text;
+    color: transparent;
+    font-family: var(--sg-sys-typescale-display-small-medium-font-family);
+    font-size: var(--sg-sys-typescale-display-small-medium-font-size);
+    font-style: var(--sg-sys-typescale-display-small-medium-font-style);
+    font-weight: var(--sg-sys-typescale-display-small-medium-font-weight);
+    letter-spacing: var(--sg-sys-typescale-display-small-medium-letter-spacing);
+    line-height: var(--sg-sys-typescale-display-small-medium-line-height);
+    position: relative;
+    text-fill-color: transparent;
+    white-space: nowrap;
+    width: fit-content;
+}

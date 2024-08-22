@@ -1,0 +1,55 @@
+/* Define your design system variables if you haven't already */
+:root {
+  --gap-3xs: 4px;
+  --gap-5xs: 8px;
+  --padding-base: 16px;
+  --padding-sm: 8px;
+  --sg-sys-typescale-body-large-regular-size: 16px;
+  --sg-sys-color-on-surface: #32373a;
+  --sg-sys-typescale-headline-medium-semibold: 'Inter', sans-serif;
+}
+
+.progress-labels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--padding-base) var(--padding-sm);
+  gap: var(--gap-5xs);
+  text-align: left;
+  font-size: var(--sg-sys-typescale-body-large-regular-size);
+  color: var(--sg-sys-color-on-surface);
+  font-family: var(--sg-sys-typescale-headline-medium-semibold);
+}
+
+.applications-in-progress {
+  letter-spacing: 0.01em;
+  line-height: 24px;
+}
+
+.empty-progress {
+  flex: 1;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+.vuesaxlineararrow-right-icon1 {
+  width: 20px;
+  height: 20px;
+  display: none; /* Adjust this if needed */
+}
+
+.completed {
+  display: flex;
+  align-items: center;
+}
+
+.progress-labels .completed {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-3xs);
+  font-size: 24px;
+}

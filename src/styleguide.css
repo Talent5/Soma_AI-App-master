@@ -1,0 +1,10 @@
+:root {
+    --sg-sys-typescale-display-small-medium-font-family: "Inter", Helvetica;
+    --sg-sys-typescale-display-small-medium-font-size: 48.83000183105469px;
+    --sg-sys-typescale-display-small-medium-font-style: normal;
+    --sg-sys-typescale-display-small-medium-font-weight: 500;
+    --sg-sys-typescale-display-small-medium-letter-spacing: 0px;
+    --sg-sys-typescale-display-small-medium-line-height: 44px;
+    --variable-collection-on-primary: rgba(255, 255, 255, 1);
+    --variable-collection-primary-color: rgba(30, 21, 72, 1);
+    }

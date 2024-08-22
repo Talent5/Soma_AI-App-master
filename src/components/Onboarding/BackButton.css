@@ -1,0 +1,20 @@
+/* Container for the back button */
+.back-button-container {
+  position: absolute; /* Fixes the button's position relative to the viewport */
+  top: 10px; /* Adjust the distance from the top */
+  right: 10px; /* Adjust the distance from the right */
+  z-index: 10; /* Ensures it appears above other content */
+}
+
+/* Style for the back button */
+.back-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Optional: Additional styling for the back button icon */
+.back-button .bi {
+  color: #007bff; /* Change color as needed */
+  font-size: 2rem; /* Adjust the icon size as needed */
+}

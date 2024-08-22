@@ -1,0 +1,79 @@
+.frame-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 16px;
+  background: linear-gradient(to right, #E6E0FE, #B7F1FD);
+  border-bottom: 1px solid #EAEAEA;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.scholarships-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  color: #000000;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #EAEAEA;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  height: 40px;
+  padding: 0 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(50, 55, 58, 0.5);
+}
+
+.search-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-icon .bi {
+  font-size: 20px;
+  color: rgba(50, 55, 58, 0.5);
+}
+
+.filter-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.filter-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #EAEAEA;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.filter-icon .bi {
+  font-size: 18px;
+  color: rgba(50, 55, 58, 0.5);
+}

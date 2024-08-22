@@ -1,0 +1,73 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%; /* Full width of the container */
+  padding: 16px 0; /* Padding around the header */
+  box-sizing: border-box;
+  background-color: transparent; /* White background for header */
+  border-bottom: 1px solid #ddd; /* Border to separate from content */
+}
+
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Gap between icon and text */
+}
+
+.profile-icon {
+  font-size: 24px; /* Size of profile icon */
+  color: #333; /* Dark color for visibility */
+}
+
+.alerts {
+  display: flex;
+  align-items: center;
+}
+
+.notification-icon {
+  font-size: 24px; /* Size of notification icon */
+  color: #333; /* Dark color for visibility */
+}
+
+.metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1200px; /* Maximum width for the metrics section */
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  gap: 16px; /* Gap between metrics */
+}
+
+.metric-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Gap between icon and title */
+}
+
+.metric-icon i {
+  font-size: 24px; /* Size of the icon */
+  color: #333; /* Dark color for visibility */
+}
+
+.metric-title {
+  font-weight: 500;
+  font-size: 16px; /* Font size for the title */
+  color: #333; /* Dark color for text */
+}
+
+.metric-value {
+  font-size: 24px; /* Font size for the value */
+  font-weight: 500;
+  color: #333; /* Dark color for text */
+}
+

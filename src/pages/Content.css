@@ -1,0 +1,40 @@
+.vuesaxboldpause-icon {
+  height: 16px;
+  width: 16px;
+  position: relative;
+}
+.vuesaxboldpause-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--br-81xl);
+  border: 1px solid var(--primary-color);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-base) 15px;
+}
+.welcome-to-soma {
+  align-self: stretch;
+  position: relative;
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 500;
+  font-family: var(--sg-sys-typescale-body-large-medium);
+  color: var(--sg-sys-color-on-surface);
+  text-align: left;
+}
+.content {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 20px var(--padding-base) 57px;
+  box-sizing: border-box;
+  gap: 57px;
+  line-height: normal;
+  letter-spacing: normal;
+}

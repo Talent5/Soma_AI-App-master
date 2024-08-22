@@ -1,0 +1,36 @@
+.metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 21px; /* Consistent padding */
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  gap: var(--gap-5xs); /* Consistent gap */
+}
+
+.metric-container {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3xs); /* Consistent gap */
+}
+
+.metric-icon i {
+  font-size: 24px; /* Ensure consistent icon size */
+  color: var(--sg-sys-color-on-surface); /* Consistent color */
+}
+
+.metric-title {
+  font-weight: 500;
+  font-size: var(--sg-sys-typescale-body-large-regular-size); /* Consistent font size */
+  color: var(--sg-sys-color-on-surface); /* Consistent color */
+  line-height: 24px;
+}
+
+.metric-value {
+  font-size: 24px; /* Ensure consistent value size */
+  font-weight: 500;
+  color: var(--sg-sys-color-on-surface); /* Consistent color */
+}
+
+

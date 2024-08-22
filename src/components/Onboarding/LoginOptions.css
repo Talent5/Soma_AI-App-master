@@ -1,0 +1,66 @@
+/* General button styles */
+.google-buttons, .google-buttons1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--padding-base-7) var(--padding-49xl);
+  background-color: var(--primary-color);
+  border-radius: var(--br-81xl);
+  border: 1px solid var(--primary-color);
+  gap: var(--gap-3xs);
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: center; /* Center text within the button */
+}
+.google-buttons1{
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+
+}
+/* Icon styles */
+.google-icon, .google-icon1 {
+  justify-content: center;
+  align-items: center;
+  color: rgb(0, 255, 200);
+  font-size: 24px; /* Adjust size as needed */
+  margin-right: 8px; /* Space between icon and text */
+}
+
+/* Text styles */
+.sign-up-with, .log-in-with {
+  font-size: var(--sg-sys-typescale-body-large-medium-size);
+  color: var(--on-primary);
+  text-align: center; /* Center text */
+  line-height: 24px; /* Ensure text aligns with the button height */
+}
+
+/* Container styles */
+.login-options {
+  padding: auto;
+  display: flex;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--gap-mini);
+  text-align: center;
+  font-size: var(--sg-sys-typescale-body-medium-regular-size);
+  color: var(--sg-sys-color-on-surface);
+  font-family: var(--sg-sys-typescale-body-large-medium);
+}
+
+.already-have-an {
+  align-self: stretch;
+  line-height: 20px;
+}
+
+/* Optional: Additional styling for buttons */
+.google-buttons1 {
+  border-radius: var(--br-81xl);
+  border: 1px solid var(--primary-color);
+  padding: var(--padding-sm) var(--padding-54xl);
+  font-size: var(--sg-sys-typescale-body-large-medium-size);
+}
+
