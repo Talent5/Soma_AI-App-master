@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ReviewScreen = ({ formData, onConfirm, onEdit }) => {
-  const navigate = useNavigate();
+  useNavigate();
 
   const handleConfirm = () => {
     onConfirm();

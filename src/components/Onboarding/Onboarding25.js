@@ -11,9 +11,10 @@ export const Onboarding25 = () => {
   const { formData, submitFormData } = useContext(FormDataContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [cvFile, setCvFile] = useState(null);
+  // Removed the unused cvFile state
   const [showReview, setShowReview] = useState(false);
 
+  // Updated dependency array
   const handleProfileUpdate = useCallback(async () => {
     setIsSubmitting(true);
     setError('');
@@ -23,39 +24,17 @@ export const Onboarding25 = () => {
         throw new Error('Failed to submit form data');
       }
       console.log('Form data submitted successfully');
-      if (cvFile) {
-        await handleCVUpload(cvFile);
-      } else {
-        navigate('/home');
-      }
+      navigate('/home'); // Directly navigate if no CV file
     } catch (error) {
       console.error('Error submitting form data:', error);
       setError(error.message || 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
-  }, [cvFile, navigate, submitFormData]);
+  }, [navigate, submitFormData]);
 
-  const handleCVUpload = useCallback(async (file) => {
-    const userId = formData.userId; // Ensure you have the user ID in your form data
-    const formDataToUpload = new FormData();
-    formDataToUpload.append('file', file);
-    try {
-      const response = await fetch(`https://somaai.onrender.com/api/${userId}/upload`, {
-        method: 'POST',
-        body: formDataToUpload,
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error uploading CV');
-      }
-      console.log('CV uploaded successfully');
-      navigate('/home');
-    } catch (error) {
-      console.error('Error uploading CV:', error);
-      setError(error.message || 'Failed to upload CV');
-    }
-  }, [formData.userId, navigate]);
+  // Updated dependency array
+  // Removed the unused handleCVUpload function
 
   const handleReview = () => {
     setShowReview(true);
@@ -67,7 +46,7 @@ export const Onboarding25 = () => {
 
   const handleConfirm = () => {
     setShowReview(false);
-    handleProfileUpdate();
+    handleProfileUpdate(); // Ensure CV upload is handled elsewhere if needed
   };
 
   return (

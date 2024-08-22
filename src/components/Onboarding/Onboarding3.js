@@ -17,7 +17,7 @@ export const Onboarding3 = () => {
     if (formData.currentStep !== 3) {
       updateFormData({ currentStep: 3 });
     }
-  }, []); // Empty dependency array ensures this runs only once when the component mounts
+  }, [formData.currentStep, updateFormData]);
 
   const handleInputChange = (e) => {
     updateFormData({ firstName: e.target.value });
