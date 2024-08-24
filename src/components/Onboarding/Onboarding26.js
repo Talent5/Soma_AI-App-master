@@ -16,7 +16,6 @@ export const Onboarding26 = () => {
     if (storedFormData) {
       updateFormData(JSON.parse(storedFormData));
     }
-    // Dependency array is empty to run only once on mount
   }, [updateFormData]);
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export const Onboarding26 = () => {
     if (formData) {
       localStorage.setItem('formData', JSON.stringify(formData));
     }
-    // Dependency array contains formData to update only when formData changes
   }, [formData]);
 
   const handleFileChange = (e) => {
@@ -36,7 +34,8 @@ export const Onboarding26 = () => {
 
   const handleContinue = () => {
     if (cv) {
-      updateFormData({ ...formData, cv }); // Merge CV with existing formData
+      // Update formData with the new CV file
+      updateFormData({ ...formData, cv });
       navigate('/onboarding10');
     } else {
       alert('Please upload your CV before continuing.');

@@ -33,7 +33,7 @@ export const FormDataProvider = ({ children }) => {
       highSchoolName: '',
       gpa: '',
       educationLevel: '',
-      cv: null, // Assuming this is a File or Blob object
+      cv: {},
       userId: '',
     };
   });
@@ -50,23 +50,15 @@ export const FormDataProvider = ({ children }) => {
   }, []);
 
   const submitFormData = useCallback(async () => {
-    const formDataToSend = new FormData();
-
-    // Append each field from formData
-    for (const [key, value] of Object.entries(formData)) {
-      if (key === 'cv' && value) {
-        // Handle file separately if cv is a file object
-        formDataToSend.append(key, value);
-      } else {
-        formDataToSend.append(key, value);
-      }
-    }
-
     try {
       const response = await fetch('https://somaai.onrender.com/api/user/update', {
         method: 'POST',
-        body: formDataToSend,
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin,
+        },
         credentials: 'include',
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -100,7 +92,7 @@ export const FormDataProvider = ({ children }) => {
         highSchoolName: '',
         gpa: '',
         educationLevel: '',
-        cv: null,
+        cv: {},
         userId: '',
       });
 
@@ -123,4 +115,3 @@ export const FormDataProvider = ({ children }) => {
     </FormDataContext.Provider>
   );
 };
-
