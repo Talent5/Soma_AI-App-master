@@ -10,31 +10,45 @@ export const Onboarding1 = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Check for authentication result in URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const authResult = urlParams.get('auth');
     const errorMessage = urlParams.get('error');
     const action = urlParams.get('action');
 
     if (authResult === 'success') {
-      // Fetch user data after successful authentication
       fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
           if (data.user) {
             localStorage.setItem('userEmail', data.user.email);
-            if (action === 'signup') {
-              navigate('/onboarding2');
-            } else {
-              navigate('/dashboard');
-            }
+            localStorage.setItem('userId', data.user.id); // Store user ID
+
+            // Check if this is a new user or returning user
+            return fetch('https://somaai.onrender.com/api/user/check-profile', {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: data.user.id, email: data.user.email })
+            });
           } else {
-            setError('User data not found');
+            throw new Error('User data not found');
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.profileExists) {
+            // Existing user, go to dashboard
+            navigate('/dashboard');
+          } else if (action === 'signup' || action === 'login') {
+            // New user or incomplete profile, go to onboarding
+            navigate('/onboarding2');
+          } else {
+            throw new Error('Invalid action');
           }
         })
         .catch(err => {
-          console.error('Error fetching user data:', err);
-          setError('Failed to fetch user data');
+          console.error('Error:', err);
+          setError(err.message || 'An unexpected error occurred');
         });
     } else if (authResult === 'failure' || errorMessage) {
       setError(errorMessage || 'Authentication failed');
@@ -43,7 +57,6 @@ export const Onboarding1 = () => {
 
   const initiateGoogleAuth = (action) => {
     const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
-    // Redirect to the backend route that starts the Google OAuth process
     window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
@@ -70,7 +83,6 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
 
 
 
