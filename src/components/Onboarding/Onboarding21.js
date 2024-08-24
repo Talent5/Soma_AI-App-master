@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -17,39 +17,25 @@ export const Onboarding21 = () => {
 
   const handleAddRole = () => {
     if (newRole.trim() !== '') {
-      setLeadershipRoles([...leadershipRoles, newRole.trim()]);
+      setLeadershipRoles((prevRoles) => [...prevRoles, newRole.trim()]);
       setNewRole('');
     }
   };
 
   const handleRemoveRole = (index) => {
-    const updatedRoles = [...leadershipRoles];
-    updatedRoles.splice(index, 1);
-    setLeadershipRoles(updatedRoles);
+    setLeadershipRoles((prevRoles) => prevRoles.filter((_, i) => i !== index));
   };
 
   const handleContinue = () => {
     updateFormData({ ...formData, leadershipRoles });
-    navigate('/onboarding22');
+    navigate('/onboarding22'); // Ensure the route is correctly configured
   };
-
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="onboarding-screen">
       <BackButton />
       <Header />
 
-      {/* Adjust progress bar width based on the total number of steps */}
       <div className="progress-bar">
         <div className="progress" style={{ width: '30%' }}></div> {/* Adjust according to the step */}
       </div>
@@ -90,5 +76,3 @@ export const Onboarding21 = () => {
     </div>
   );
 };
-
-

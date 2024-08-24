@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -8,27 +8,16 @@ import Header from './Header';
 export const Onboarding24 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData } = useContext(FormDataContext);
-  const [financialNeed, updateFinancialNeed] = useState(formData.financialNeed || '');
+  const [financialNeed, setFinancialNeed] = useState(formData.financialNeed || '');
 
   const handleInputChange = (e) => {
-    updateFinancialNeed(e.target.value);
+    setFinancialNeed(e.target.value);
   };
 
   const handleContinue = () => {
     updateFormData({ ...formData, financialNeed });
-    navigate('/onboarding25'); 
+    navigate('/onboarding25');
   };
-
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="onboarding-screen">
@@ -41,7 +30,7 @@ export const Onboarding24 = () => {
       <p className="section-title">~ Financial information</p>
       <h2>Financial need status?</h2>
 
-      <div>
+      <div className="radio-group">
         <label>
           <input
             type="radio"
@@ -51,8 +40,6 @@ export const Onboarding24 = () => {
           />
           Requires full need-based aid
         </label>
-      </div>
-      <div>
         <label>
           <input
             type="radio"
@@ -62,8 +49,6 @@ export const Onboarding24 = () => {
           />
           Requires partial need-based aid
         </label>
-      </div>
-      <div>
         <label>
           <input
             type="radio"

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -30,17 +30,6 @@ export const Onboarding18 = () => {
     updateFormData({ ...formData, sports });
     navigate('/onboarding19');
   };
-
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="onboarding-screen">
@@ -85,4 +74,3 @@ export const Onboarding18 = () => {
     </div>
   );
 };
-

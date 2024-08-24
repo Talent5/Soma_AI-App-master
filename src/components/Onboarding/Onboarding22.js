@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -17,15 +17,13 @@ export const Onboarding22 = () => {
 
   const handleAddAward = () => {
     if (newAward.trim() !== '') {
-      setAwards([...awards, newAward.trim()]);
+      setAwards((prevAwards) => [...prevAwards, newAward.trim()]);
       setNewAward('');
     }
   };
 
   const handleRemoveAward = (index) => {
-    const updatedAwards = [...awards];
-    updatedAwards.splice(index, 1);
-    setAwards(updatedAwards);
+    setAwards((prevAwards) => prevAwards.filter((_, i) => i !== index));
   };
 
   const handleContinue = () => {
@@ -33,25 +31,13 @@ export const Onboarding22 = () => {
     navigate('/onboarding23');
   };
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
-
   return (
     <div className="onboarding-screen">
       <BackButton />
       <Header />
 
-      {/* Adjust progress bar width based on the total number of steps */}
       <div className="progress-bar">
-        <div className="progress" style={{ width: '45%' }}></div> {/* Adjust as necessary */}
+        <div className="progress" style={{ width: '45%' }}></div> {/* Adjust based on step */}
       </div>
 
       <p className="section-title">~ Achievements</p>
@@ -69,7 +55,6 @@ export const Onboarding22 = () => {
         <button className="add-button" onClick={handleAddAward} aria-label="Add award">Add</button>
       </div>
 
-      {/* Display added awards */}
       <ul className="added-items-list">
         {awards.map((award, index) => (
           <li key={index} className="added-item">
@@ -90,3 +75,4 @@ export const Onboarding22 = () => {
     </div>
   );
 };
+

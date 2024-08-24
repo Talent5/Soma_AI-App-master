@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -16,23 +16,12 @@ export const Onboarding17 = () => {
 
   const handleContinue = () => {
     if (degreeType) {
-      updateFormData({ ...formData, degreeType });
+      updateFormData({ degreeType });
       navigate('/onboarding18'); // Ensure this route is configured
     } else {
       alert('Please select a degree type before continuing.');
     }
   };
-
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="onboarding-screen">
@@ -44,7 +33,7 @@ export const Onboarding17 = () => {
         <div className="progress" style={{ width: '85%' }}></div> {/* Example width */}
       </div>
 
-      <p className="section-title">~ Field of study</p>
+      <p className="section-title">~ Degree Type</p>
       <h2>Your preferred degree type?</h2>
 
       <div className="radio-group">

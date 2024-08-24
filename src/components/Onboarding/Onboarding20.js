@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -19,23 +19,11 @@ export const Onboarding20 = () => {
     navigate('/onboarding21'); // Ensure the route is properly configured
   };
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
-
   return (
     <div className="onboarding-screen">
       <BackButton />
       <Header />
 
-      {/* Adjust progress bar width based on current step */}
       <div className="progress-bar">
         <div className="progress" style={{ width: '100%' }}></div> {/* Adjusted to 100% for the last step */}
       </div>

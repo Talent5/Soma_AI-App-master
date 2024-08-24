@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -38,23 +38,12 @@ export const Onboarding16 = () => {
 
   const handleContinue = () => {
     if (intendedFieldOfStudy) {
-      updateFormData({ ...formData, intendedFieldOfStudy });
+      updateFormData({ intendedFieldOfStudy });
       navigate('/onboarding17'); // Ensure this route is properly configured
     } else {
       alert('Please select a field of study before continuing.');
     }
   };
-
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
-
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <div className="onboarding-screen">
@@ -91,6 +80,3 @@ export const Onboarding16 = () => {
     </div>
   );
 };
-
-
-
