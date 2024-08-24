@@ -11,10 +11,8 @@ export const Onboarding25 = () => {
   const { formData, submitFormData } = useContext(FormDataContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  // Removed the unused cvFile state
   const [showReview, setShowReview] = useState(false);
 
-  // Updated dependency array
   const handleProfileUpdate = useCallback(async () => {
     setIsSubmitting(true);
     setError('');
@@ -24,7 +22,7 @@ export const Onboarding25 = () => {
         throw new Error('Failed to submit form data');
       }
       console.log('Form data submitted successfully');
-      navigate('/home'); // Directly navigate if no CV file
+      navigate('/home');
     } catch (error) {
       console.error('Error submitting form data:', error);
       setError(error.message || 'An unexpected error occurred');
@@ -32,9 +30,6 @@ export const Onboarding25 = () => {
       setIsSubmitting(false);
     }
   }, [navigate, submitFormData]);
-
-  // Updated dependency array
-  // Removed the unused handleCVUpload function
 
   const handleReview = () => {
     setShowReview(true);
@@ -46,7 +41,7 @@ export const Onboarding25 = () => {
 
   const handleConfirm = () => {
     setShowReview(false);
-    handleProfileUpdate(); // Ensure CV upload is handled elsewhere if needed
+    handleProfileUpdate();
   };
 
   return (
@@ -59,7 +54,6 @@ export const Onboarding25 = () => {
       <p className="section-title">~ Welcome To SomaAi</p>
       <h2>Review Your Information</h2>
       {error && <p className="error-message">{error}</p>}
-
       {showReview ? (
         <ReviewScreen
           formData={formData}

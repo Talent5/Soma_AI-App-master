@@ -1,11 +1,18 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 export const FormDataContext = createContext();
 
 export const FormDataProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
     const storedData = localStorage.getItem('formData');
-    return storedData ? JSON.parse(storedData) : {
+    if (storedData) {
+      try {
+        return JSON.parse(storedData);
+      } catch (error) {
+        console.error('Error parsing stored form data:', error);
+      }
+    }
+    return {
       firstName: '',
       lastName: '',
       middleName: '',
@@ -26,8 +33,8 @@ export const FormDataProvider = ({ children }) => {
       highSchoolName: '',
       gpa: '',
       educationLevel: '',
-      cv: {}, // For storing CV metadata if needed
-      userId: '', // Assuming you'll need userId for some operations
+      cv: {},
+      userId: '',
     };
   });
 
@@ -96,8 +103,14 @@ export const FormDataProvider = ({ children }) => {
     }
   }, [formData]);
 
+  const contextValue = useMemo(() => ({
+    formData,
+    updateFormData,
+    submitFormData
+  }), [formData, updateFormData, submitFormData]);
+
   return (
-    <FormDataContext.Provider value={{ formData, updateFormData, submitFormData }}>
+    <FormDataContext.Provider value={contextValue}>
       {children}
     </FormDataContext.Provider>
   );
