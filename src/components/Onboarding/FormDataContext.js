@@ -2,6 +2,31 @@ import React, { createContext, useState, useEffect, useCallback, useMemo } from 
 
 export const FormDataContext = createContext();
 
+const initialFormState = {
+  firstName: '',
+  lastName: '',
+  middleName: '',
+  dateOfBirth: '',
+  emailAddress: '',
+  phoneNumber: '',
+  countryName: '',
+  intendedFieldOfStudy: '',
+  degreeType: '',
+  sports: [],
+  clubs: [],
+  communityService: '',
+  leadershipRoles: [],
+  awards: [],
+  incomeBracket: '',
+  financialNeed: '',
+  universityName: '',
+  highSchoolName: '',
+  gpa: '',
+  educationLevel: '',
+  cv: {},
+  userId: '',
+};
+
 export const FormDataProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
     const storedData = localStorage.getItem('formData');
@@ -10,36 +35,21 @@ export const FormDataProvider = ({ children }) => {
         return JSON.parse(storedData);
       } catch (error) {
         console.error('Error parsing stored form data:', error);
+        return initialFormState;
       }
     }
-    return {
-      firstName: '',
-      lastName: '',
-      middleName: '',
-      dateOfBirth: '',
-      emailAddress: '',
-      phoneNumber: '',
-      countryName: '',
-      intendedFieldOfStudy: '',
-      degreeType: '',
-      sports: [],
-      clubs: [],
-      communityService: '',
-      leadershipRoles: [],
-      awards: [],
-      incomeBracket: '',
-      financialNeed: '',
-      universityName: '',
-      highSchoolName: '',
-      gpa: '',
-      educationLevel: '',
-      cv: {},
-      userId: '',
-    };
+    return initialFormState;
   });
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
+    const saveData = () => {
+      localStorage.setItem('formData', JSON.stringify(formData));
+    };
+
+    // Debounce the save operation
+    const timeoutId = setTimeout(saveData, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [formData]);
 
   const updateFormData = useCallback((newData) => {
@@ -62,8 +72,8 @@ export const FormDataProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to submit form data');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
 
       const responseData = await response.json();
@@ -71,43 +81,26 @@ export const FormDataProvider = ({ children }) => {
 
       // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
-      setFormData({
-        firstName: '',
-        lastName: '',
-        middleName: '',
-        dateOfBirth: '',
-        emailAddress: '',
-        phoneNumber: '',
-        countryName: '',
-        intendedFieldOfStudy: '',
-        degreeType: '',
-        sports: [],
-        clubs: [],
-        communityService: '',
-        leadershipRoles: [],
-        awards: [],
-        incomeBracket: '',
-        financialNeed: '',
-        universityName: '',
-        highSchoolName: '',
-        gpa: '',
-        educationLevel: '',
-        cv: {},
-        userId: '',
-      });
+      setFormData(initialFormState);
 
-      return true; // Indicates successful submission
+      return { success: true, data: responseData };
     } catch (error) {
       console.error('Error submitting form data:', error);
-      return false; // Indicates failed submission
+      return { success: false, error: error.message };
     }
   }, [formData]);
+
+  const resetFormData = useCallback(() => {
+    localStorage.removeItem('formData');
+    setFormData(initialFormState);
+  }, []);
 
   const contextValue = useMemo(() => ({
     formData,
     updateFormData,
-    submitFormData
-  }), [formData, updateFormData, submitFormData]);
+    submitFormData,
+    resetFormData
+  }), [formData, updateFormData, submitFormData, resetFormData]);
 
   return (
     <FormDataContext.Provider value={contextValue}>
