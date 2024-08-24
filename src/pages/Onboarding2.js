@@ -17,12 +17,10 @@ export const Onboarding2 = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow flex items-center justify-center bg-transparent">
-        <div className="max-w-2xl w-full bg-transparent p-8 rounded-lg ">
+        <div className="max-w-2xl w-full bg-transparent p-8 rounded-lg">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
-            Account successfully created, To get your profile fully set up, you'll need to provide the following details:
+            Account successfully created. To get your profile fully set up, you'll need to provide the following details:
           </h1>
-          <p className="mb-4 text-gray-600">
-          </p>
           <ul className="list-disc list-inside mb-6 text-gray-600">
             <li>Personal information</li>
             <li>Educational background</li>

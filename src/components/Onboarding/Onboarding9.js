@@ -10,19 +10,17 @@ export const Onboarding9 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [countryName, setCountryName] = useState(formData.nationality || '');
 
+  // Effect to handle form data update on mount
   useEffect(() => {
-    // Update form data context with the current step only once on mount
-    const updateStep = () => {
-      updateFormData((prev) => {
-        if (prev.currentStep !== 9) {
-          return { ...prev, currentStep: 9 };
-        }
-        return prev;
-      });
-    };
-    
-    updateStep();
-  }, [updateFormData]); // Ensure `updateFormData` is stable or memoized
+    if (formData.currentStep !== 9) {
+      updateFormData((prev) => ({ ...prev, currentStep: 9 }));
+    }
+  }, [formData.currentStep, updateFormData]);
+
+  // Effect to synchronize form data with local storage
+  useEffect(() => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+  }, [formData]);
 
   const handleChange = (event) => {
     setCountryName(event.target.value);
@@ -42,8 +40,9 @@ export const Onboarding9 = () => {
       <BackButton />
       <Header />
 
+      {/* Progress bar */}
       <div className="progress-bar">
-        <div className="progress" style={{ width: '90%' }}></div>
+        <div className="progress" style={{ width: '90%' }}></div> {/* Adjust width based on progress */}
       </div>
 
       <p className="section-title">~ Personal information</p>
@@ -66,6 +65,7 @@ export const Onboarding9 = () => {
     </div>
   );
 };
+
 
 
 

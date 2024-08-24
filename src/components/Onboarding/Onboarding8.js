@@ -13,11 +13,14 @@ export const Onboarding8 = () => {
   const [phoneNumber, setPhoneNumber] = useState(formData.phoneNumber || '');
 
   const memoizedUpdateFormData = useCallback(
-    (data) => updateFormData(data),
+    (data) => {
+      updateFormData(data);
+    },
     [updateFormData]
   );
 
   useEffect(() => {
+    // Only update the current step if it’s not already set to 8
     if (formData.currentStep !== 8) {
       memoizedUpdateFormData({ currentStep: 8 });
     }
@@ -53,6 +56,7 @@ export const Onboarding8 = () => {
         value={phoneNumber}
         onChange={handlePhoneNumberChange}
         inputClass="input-field"
+        placeholder="Enter your phone number"
       />
 
       <button className="continue-button" onClick={handleContinue}>

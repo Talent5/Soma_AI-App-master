@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,13 +11,6 @@ import BackButton from './BackButton';
 export const Onboarding3 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData } = useContext(FormDataContext);
-
-  useEffect(() => {
-    // Only update formData if the current step is not already 3
-    if (formData.currentStep !== 3) {
-      updateFormData({ currentStep: 3 });
-    }
-  }, [formData.currentStep, updateFormData]);
 
   const handleInputChange = (e) => {
     updateFormData({ firstName: e.target.value });
@@ -46,7 +39,7 @@ export const Onboarding3 = () => {
         type="text"
         className="input-field bg-transparent border-b"
         placeholder="E.g. Peter"
-        value={formData.firstName}
+        value={formData.firstName || ''} // Ensure controlled input
         onChange={handleInputChange}
         aria-label="First name"
       />
