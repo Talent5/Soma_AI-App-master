@@ -45,7 +45,10 @@ export const FormDataProvider = ({ children }) => {
     const saveData = () => {
       localStorage.setItem('formData', JSON.stringify(formData));
     };
+
+    // Debounce the save operation
     const timeoutId = setTimeout(saveData, 500);
+
     return () => clearTimeout(timeoutId);
   }, [formData]);
 
@@ -58,11 +61,6 @@ export const FormDataProvider = ({ children }) => {
 
   const submitFormData = useCallback(async () => {
     try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
-        throw new Error('User ID not found. Please log in again.');
-      }
-
       const response = await fetch('https://somaai.onrender.com/api/user/update', {
         method: 'PATCH',
         headers: {
@@ -70,7 +68,7 @@ export const FormDataProvider = ({ children }) => {
           'Origin': window.location.origin,
         },
         credentials: 'include',
-        body: JSON.stringify({ ...formData, userId }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -80,8 +78,11 @@ export const FormDataProvider = ({ children }) => {
 
       const responseData = await response.json();
       console.log('Submission successful:', responseData);
+
+      // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
       setFormData(initialFormState);
+
       return { success: true, data: responseData };
     } catch (error) {
       console.error('Error submitting form data:', error);
