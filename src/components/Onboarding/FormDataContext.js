@@ -62,7 +62,7 @@ export const FormDataProvider = ({ children }) => {
   const submitFormData = useCallback(async () => {
     try {
       const response = await fetch('https://somaai.onrender.com/api/user/update', {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Origin': window.location.origin,
