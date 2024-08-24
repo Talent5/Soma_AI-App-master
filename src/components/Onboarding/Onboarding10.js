@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -10,16 +10,25 @@ export const Onboarding10 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [educationLevel, setEducationLevel] = useState(formData.educationLevel || '');
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
+    // Synchronize localStorage with formData on mount
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      memoizedUpdateFormData(JSON.parse(storedFormData));
+    }
+  }, [memoizedUpdateFormData]);
+
+  useEffect(() => {
+    // Save formData to localStorage whenever formData or educationLevel changes
+    localStorage.setItem('formData', JSON.stringify({ ...formData, educationLevel }));
+  }, [formData, educationLevel]);
 
   const handleInputChange = (e) => {
     setEducationLevel(e.target.value);
@@ -27,7 +36,7 @@ export const Onboarding10 = () => {
 
   const handleContinue = () => {
     if (educationLevel) {
-      updateFormData({ educationLevel });
+      memoizedUpdateFormData({ educationLevel });
       navigate('/onboarding11');
     } else {
       alert('Please select your current level of education.');

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -8,19 +8,26 @@ import Header from './Header';
 export const Onboarding9 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData } = useContext(FormDataContext);
-  const [countryName, setCountryName] = useState(formData.nationality || '');
+  const [countryName, setCountryName] = useState(formData.countryName || '');
 
-  // Effect to handle form data update on mount
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
+
+  // Effect to set the current step when the component mounts
   useEffect(() => {
     if (formData.currentStep !== 9) {
-      updateFormData((prev) => ({ ...prev, currentStep: 9 }));
+      memoizedUpdateFormData({ currentStep: 9 });
     }
-  }, [formData.currentStep, updateFormData]);
+  }, [formData.currentStep, memoizedUpdateFormData]);
 
   // Effect to synchronize form data with local storage
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
+    localStorage.setItem('formData', JSON.stringify({ ...formData, countryName }));
+  }, [formData, countryName]);
 
   const handleChange = (event) => {
     setCountryName(event.target.value);
@@ -28,7 +35,7 @@ export const Onboarding9 = () => {
 
   const handleContinue = () => {
     if (countryName) {
-      updateFormData((prev) => ({ ...prev, nationality: countryName }));
+      memoizedUpdateFormData({ countryName });
       navigate('/onboarding26'); // Navigate to the next step
     } else {
       alert('Please enter your nationality.');
@@ -40,9 +47,8 @@ export const Onboarding9 = () => {
       <BackButton />
       <Header />
 
-      {/* Progress bar */}
       <div className="progress-bar">
-        <div className="progress" style={{ width: '90%' }}></div> {/* Adjust width based on progress */}
+        <div className="progress" style={{ width: '90%' }}></div>
       </div>
 
       <p className="section-title">~ Personal information</p>
@@ -65,6 +71,7 @@ export const Onboarding9 = () => {
     </div>
   );
 };
+
 
 
 

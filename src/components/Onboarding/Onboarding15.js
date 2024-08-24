@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -7,19 +7,28 @@ import Header from './Header';
 
 export const Onboarding15 = () => {
   const navigate = useNavigate();
-  const { formData, updateFormData } = useContext(FormDataContext); // Renamed to match earlier updates
+  const { formData, updateFormData } = useContext(FormDataContext);
   const [graduationDate, setGraduationDate] = useState(formData.graduationDate || '');
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
+    // Load form data from localStorage on mount
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      memoizedUpdateFormData(JSON.parse(storedFormData));
+    }
+  }, [memoizedUpdateFormData]);
+
+  useEffect(() => {
+    // Save form data to localStorage whenever formData or graduationDate changes
+    localStorage.setItem('formData', JSON.stringify({ ...formData, graduationDate }));
+  }, [formData, graduationDate]);
 
   const handleInputChange = (e) => {
     setGraduationDate(e.target.value);
@@ -27,7 +36,7 @@ export const Onboarding15 = () => {
 
   const handleContinue = () => {
     if (graduationDate) {
-      updateFormData({ ...formData, graduationDate });
+      memoizedUpdateFormData({ ...formData, graduationDate });
       navigate('/onboarding16'); // Ensure this route is configured correctly
     } else {
       alert('Please select a graduation date before continuing.');

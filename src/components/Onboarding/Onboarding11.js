@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -10,16 +10,25 @@ export const Onboarding11 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [highSchoolName, setHighSchoolName] = useState(formData.highSchoolName || '');
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
+    // Synchronize localStorage with formData on mount
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      memoizedUpdateFormData(JSON.parse(storedFormData));
+    }
+  }, [memoizedUpdateFormData]);
+
+  useEffect(() => {
+    // Save formData to localStorage whenever formData or highSchoolName changes
+    localStorage.setItem('formData', JSON.stringify({ ...formData, highSchoolName }));
+  }, [formData, highSchoolName]);
 
   const handleInputChange = (e) => {
     setHighSchoolName(e.target.value);
@@ -27,7 +36,7 @@ export const Onboarding11 = () => {
 
   const handleContinue = () => {
     if (highSchoolName.trim()) {
-      updateFormData({ ...formData, highSchoolName });
+      memoizedUpdateFormData({ ...formData, highSchoolName });
       navigate('/onboarding12');
     } else {
       alert("Please fill out the form before continuing.");
@@ -64,4 +73,5 @@ export const Onboarding11 = () => {
     </div>
   );
 };
+
 

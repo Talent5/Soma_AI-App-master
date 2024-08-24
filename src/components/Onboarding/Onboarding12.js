@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -10,23 +10,32 @@ export const Onboarding12 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [universityName, setUniversityName] = useState(formData.universityName || '');
 
-  useEffect(() => {
-    const storedFormData = localStorage.getItem('formData');
-    if (storedFormData) {
-      updateFormData(JSON.parse(storedFormData));
-    }
-  }, [updateFormData]);
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
 
   useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
+    // Synchronize localStorage with formData on mount
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      memoizedUpdateFormData(JSON.parse(storedFormData));
+    }
+  }, [memoizedUpdateFormData]);
+
+  useEffect(() => {
+    // Save formData to localStorage whenever formData or universityName changes
+    localStorage.setItem('formData', JSON.stringify({ ...formData, universityName }));
+  }, [formData, universityName]);
 
   const handleInputChange = (e) => {
     setUniversityName(e.target.value);
   };
 
   const handleContinue = () => {
-    updateFormData({ ...formData, universityName });
+    memoizedUpdateFormData({ ...formData, universityName });
     navigate('/onboarding13');
   };
 
@@ -60,4 +69,5 @@ export const Onboarding12 = () => {
     </div>
   );
 };
+
 
