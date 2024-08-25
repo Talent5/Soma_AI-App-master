@@ -21,14 +21,18 @@ export const Onboarding1 = () => {
         .then(data => {
           if (data.user) {
             localStorage.setItem('userEmail', data.user.email);
-            localStorage.setItem('userId', data.user.id); // Store user ID
-
-            // Check if this is a new user or returning user
-            return fetch('https://somaai.onrender.com/api/user/check-profile', {
+            localStorage.setItem('userId', data.user.id);
+            
+            // Ensure user is created in our database
+            return fetch('https://somaai.onrender.com/api/user/ensure-user', {
               method: 'POST',
-              credentials: 'include',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: data.user.id, email: data.user.email })
+              credentials: 'include',
+              body: JSON.stringify({ 
+                userId: data.user.id, 
+                email: data.user.email,
+                name: data.user.name // Assuming Google provides a name
+              })
             });
           } else {
             throw new Error('User data not found');
@@ -36,14 +40,10 @@ export const Onboarding1 = () => {
         })
         .then(response => response.json())
         .then(data => {
-          if (data.profileExists) {
-            // Existing user, go to dashboard
-            navigate('/dashboard');
-          } else if (action === 'signup' || action === 'login') {
-            // New user or incomplete profile, go to onboarding
+          if (data.success) {
             navigate('/onboarding2');
           } else {
-            throw new Error('Invalid action');
+            throw new Error(data.message || 'Failed to create user profile');
           }
         })
         .catch(err => {

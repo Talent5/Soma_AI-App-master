@@ -32,23 +32,21 @@ export const FormDataProvider = ({ children }) => {
     const storedData = localStorage.getItem('formData');
     if (storedData) {
       try {
-        return JSON.parse(storedData);
+        const parsedData = JSON.parse(storedData);
+        return { ...parsedData, userId: localStorage.getItem('userId') };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
-        return initialFormState;
+        return { ...initialFormState, userId: localStorage.getItem('userId') };
       }
     }
-    return initialFormState;
+    return { ...initialFormState, userId: localStorage.getItem('userId') };
   });
 
   useEffect(() => {
     const saveData = () => {
       localStorage.setItem('formData', JSON.stringify(formData));
     };
-
-    // Debounce the save operation
     const timeoutId = setTimeout(saveData, 500);
-
     return () => clearTimeout(timeoutId);
   }, [formData]);
 
@@ -61,6 +59,13 @@ export const FormDataProvider = ({ children }) => {
 
   const submitFormData = useCallback(async () => {
     try {
+      const userId = formData.userId || localStorage.getItem('userId');
+      if (!userId) {
+        throw new Error('User ID not found. Please log in again.');
+      }
+
+      console.log('Submitting form data:', { ...formData, userId });
+
       const response = await fetch('https://somaai.onrender.com/api/user/update', {
         method: 'PATCH',
         headers: {
@@ -68,7 +73,7 @@ export const FormDataProvider = ({ children }) => {
           'Origin': window.location.origin,
         },
         credentials: 'include',
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, userId }),
       });
 
       if (!response.ok) {
@@ -78,11 +83,8 @@ export const FormDataProvider = ({ children }) => {
 
       const responseData = await response.json();
       console.log('Submission successful:', responseData);
-
-      // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
       setFormData(initialFormState);
-
       return { success: true, data: responseData };
     } catch (error) {
       console.error('Error submitting form data:', error);
