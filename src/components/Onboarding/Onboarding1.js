@@ -13,7 +13,7 @@ export const Onboarding1 = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const authResult = urlParams.get('auth');
     const errorMessage = urlParams.get('error');
-    const action = urlParams.get('action');
+    urlParams.get('action');
 
     if (authResult === 'success') {
       fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' })
