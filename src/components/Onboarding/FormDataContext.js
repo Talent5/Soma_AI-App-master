@@ -2,6 +2,8 @@ import React, { createContext, useState, useEffect, useCallback, useMemo } from 
 
 export const FormDataContext = createContext();
 
+const API_BASE_URL = 'https://somaai.onrender.com';
+
 const initialFormState = {
   firstName: '',
   lastName: '',
@@ -27,20 +29,21 @@ const initialFormState = {
   userId: '',
 };
 
-export const FormDataProvider = ({ children }) => {
-  const [formData, setFormData] = useState(() => {
+const getStoredFormData = () => {
+  try {
     const storedData = localStorage.getItem('formData');
     if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        return { ...parsedData, userId: localStorage.getItem('userId') };
-      } catch (error) {
-        console.error('Error parsing stored form data:', error);
-        return { ...initialFormState, userId: localStorage.getItem('userId') };
-      }
+      const parsedData = JSON.parse(storedData);
+      return { ...parsedData, userId: localStorage.getItem('userId') };
     }
-    return { ...initialFormState, userId: localStorage.getItem('userId') };
-  });
+  } catch (error) {
+    console.error('Error parsing stored form data:', error);
+  }
+  return { ...initialFormState, userId: localStorage.getItem('userId') };
+};
+
+export const FormDataProvider = ({ children }) => {
+  const [formData, setFormData] = useState(getStoredFormData);
 
   useEffect(() => {
     const saveData = () => {
@@ -58,15 +61,15 @@ export const FormDataProvider = ({ children }) => {
   }, []);
 
   const submitFormData = useCallback(async () => {
+    const userId = formData.userId || localStorage.getItem('userId');
+    if (!userId) {
+      return { success: false, error: 'User ID not found. Please log in again.' };
+    }
+
+    console.log('Submitting form data:', { ...formData, userId });
+
     try {
-      const userId = formData.userId || localStorage.getItem('userId');
-      if (!userId) {
-        throw new Error('User ID not found. Please log in again.');
-      }
-
-      console.log('Submitting form data:', { ...formData, userId });
-
-      const response = await fetch('https://somaai.onrender.com/api/user/update', {
+      const response = await fetch(`${API_BASE_URL}/api/user/update`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
