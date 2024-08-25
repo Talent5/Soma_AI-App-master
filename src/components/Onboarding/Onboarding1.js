@@ -4,60 +4,65 @@ import IconImage from '../assets/Google.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
+const API_BASE_URL = 'https://somaai.onrender.com';
+
 export const Onboarding1 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const authResult = urlParams.get('auth');
-    const errorMessage = urlParams.get('error');
-    urlParams.get('action');
+    const handleAuthResult = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const authResult = urlParams.get('auth');
+      const errorMessage = urlParams.get('error');
 
-    if (authResult === 'success') {
-      fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' })
-        .then(response => response.json())
-        .then(data => {
-          if (data.user) {
-            localStorage.setItem('userEmail', data.user.email);
-            localStorage.setItem('userId', data.user.id);
+      if (authResult === 'success') {
+        try {
+          const userResponse = await fetch(`${API_BASE_URL}/auth/user`, { credentials: 'include' });
+          const userData = await userResponse.json();
+
+          if (userData.user) {
+            localStorage.setItem('userEmail', userData.user.email);
+            localStorage.setItem('userId', userData.user.id);
             
             // Ensure user is created in our database
-            return fetch('https://somaai.onrender.com/api/user/ensure-user', {
+            const ensureUserResponse = await fetch(`${API_BASE_URL}/api/user/ensure-user`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
               body: JSON.stringify({ 
-                userId: data.user.id, 
-                email: data.user.email,
-                name: data.user.name // Assuming Google provides a name
+                userId: userData.user.id, 
+                email: userData.user.email,
+                name: userData.user.name // Assuming Google provides a name
               })
             });
+
+            const ensureUserData = await ensureUserResponse.json();
+
+            if (ensureUserData.success) {
+              navigate('/onboarding2');
+            } else {
+              throw new Error(ensureUserData.message || 'Failed to create user profile');
+            }
           } else {
             throw new Error('User data not found');
           }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            navigate('/onboarding2');
-          } else {
-            throw new Error(data.message || 'Failed to create user profile');
-          }
-        })
-        .catch(err => {
+        } catch (err) {
           console.error('Error:', err);
           setError(err.message || 'An unexpected error occurred');
-        });
-    } else if (authResult === 'failure' || errorMessage) {
-      setError(errorMessage || 'Authentication failed');
-    }
-  }, [navigate, location]);
+        }
+      } else if (authResult === 'failure' || errorMessage) {
+        setError(errorMessage || 'Authentication failed');
+      }
+    };
+
+    handleAuthResult();
+  }, [navigate]);
 
   const initiateGoogleAuth = (action) => {
     const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
-    window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
+    window.location.href = `${API_BASE_URL}/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
   return (
@@ -83,15 +88,3 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
