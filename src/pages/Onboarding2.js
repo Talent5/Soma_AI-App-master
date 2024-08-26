@@ -15,27 +15,27 @@ export const Onboarding2 = () => {
 
         console.log('Retrieved from localStorage:', { userId, userEmail });
 
-        if (!userId || !userEmail) {
-          throw new Error('User information not found in local storage');
+        if (userId && userEmail) {
+          const response = await fetch('https://somaai.onrender.com/api/user/info', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId, email: userEmail }),
+            credentials: 'include',
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch user information');
+          }
+
+          const data = await response.json();
+          console.log('User info fetched:', data);
+
+          setUserInfo(data);
+        } else {
+          console.warn('User information not found in local storage');
         }
-
-        const response = await fetch('https://somaai.onrender.com/api/user/info', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId, email: userEmail }),
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user information');
-        }
-
-        const data = await response.json();
-        console.log('User info fetched:', data);
-
-        setUserInfo(data);
       } catch (err) {
         console.error('Error fetching user info:', err);
         setError(err.message);
@@ -95,21 +95,13 @@ export const Onboarding2 = () => {
     }
   };
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
-
-  if (!userInfo) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow flex items-center justify-center bg-transparent">
         <div className="max-w-2xl w-full bg-transparent p-8 rounded-lg">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
-            Welcome, {userInfo.name}! To get your profile fully set up, you'll need to provide the following details:
+            Welcome! To get your profile fully set up, you'll need to provide the following details:
           </h1>
           <ul className="list-disc list-inside mb-6 text-gray-600">
             <li>Personal information</li>
@@ -132,6 +124,7 @@ export const Onboarding2 = () => {
               I'll do this later
             </button>
           </div>
+          {error && <div className="text-red-500 mt-4">{error}</div>}
         </div>
       </main>
     </div>
