@@ -4,7 +4,7 @@ import Header from '../components/Welcome/Header';
 
 export const Onboarding2 = () => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState(null);
+  const [, setUserInfo] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
