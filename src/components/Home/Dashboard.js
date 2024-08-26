@@ -8,7 +8,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     // Retrieve the name and profile picture from local storage
-    const storedName = localStorage.getItem('firstName');
+    const storedName = localStorage.getItem('firstName:');
     const storedProfilePic = localStorage.getItem('profilePicture');
     if (storedName) {
       setUserName(storedName);
