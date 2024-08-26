@@ -21,23 +21,23 @@ export const Onboarding1 = () => {
 
         console.log('User data received:', userData);
 
-        localStorage.setItem('userEmail', userData.user.email);
-        localStorage.setItem('userId', userData.user.id);
+        const userId = userData.user.id;
+        const userEmail = userData.user.email;
+
+        // Store userId and userEmail in localStorage
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('userEmail', userEmail);
 
         console.log('LocalStorage after setting:', {
-          userEmail: localStorage.getItem('userEmail'),
-          userId: localStorage.getItem('userId')
+          userId: localStorage.getItem('userId'),
+          userEmail: localStorage.getItem('userEmail')
         });
-
-        if (!localStorage.getItem('userEmail') || !localStorage.getItem('userId')) {
-          throw new Error('Failed to store user data in localStorage');
-        }
 
         const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: userData.user.id, email: userData.user.email })
+          body: JSON.stringify({ userId, email: userEmail })
         });
 
         const profileData = await profileCheckResponse.json();
@@ -96,6 +96,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
