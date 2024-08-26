@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import IconImage from '../assets/Google.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,51 +9,60 @@ export const Onboarding1 = () => {
   const location = useLocation();
   const [error, setError] = useState(null);
 
+  const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
+    if (authResult === 'success') {
+      try {
+        const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
+        const userData = await userResponse.json();
+        
+        if (!userData.user) {
+          throw new Error('User data not found');
+        }
+
+        console.log('User data received:', userData);
+
+        localStorage.setItem('userEmail', userData.user.email);
+        localStorage.setItem('userId', userData.user.id);
+
+        console.log('LocalStorage after setting:', {
+          userEmail: localStorage.getItem('userEmail'),
+          userId: localStorage.getItem('userId')
+        });
+
+        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: userData.user.id, email: userData.user.email })
+        });
+
+        const profileData = await profileCheckResponse.json();
+        console.log('Profile check response:', profileData);
+
+        if (profileData.profileExists) {
+          navigate('/dashboard');
+        } else if (action === 'signup' || action === 'login') {
+          navigate('/onboarding2');
+        } else {
+          throw new Error('Invalid action');
+        }
+      } catch (err) {
+        console.error('Error during authentication process:', err);
+        setError(err.message || 'An unexpected error occurred during authentication');
+      }
+    } else if (authResult === 'failure' || errorMessage) {
+      setError(errorMessage || 'Authentication failed');
+    }
+  }, [navigate]);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const authResult = urlParams.get('auth');
     const errorMessage = urlParams.get('error');
     const action = urlParams.get('action');
 
-    if (authResult === 'success') {
-      fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' })
-        .then(response => response.json())
-        .then(data => {
-          if (data.user) {
-            localStorage.setItem('userEmail', data.user.email);
-            localStorage.setItem('userId', data.user.id); // Store user ID
-
-            // Check if this is a new user or returning user
-            return fetch('https://somaai.onrender.com/api/user/check-profile', {
-              method: 'POST',
-              credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId: data.user.id, email: data.user.email })
-            });
-          } else {
-            throw new Error('User data not found');
-          }
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.profileExists) {
-            // Existing user, go to dashboard
-            navigate('/dashboard');
-          } else if (action === 'signup' || action === 'login') {
-            // New user or incomplete profile, go to onboarding
-            navigate('/onboarding2');
-          } else {
-            throw new Error('Invalid action');
-          }
-        })
-        .catch(err => {
-          console.error('Error:', err);
-          setError(err.message || 'An unexpected error occurred');
-        });
-    } else if (authResult === 'failure' || errorMessage) {
-      setError(errorMessage || 'Authentication failed');
-    }
-  }, [navigate, location]);
+    handleAuthResult(authResult, errorMessage, action);
+  }, [handleAuthResult, location]);
 
   const initiateGoogleAuth = (action) => {
     const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
@@ -83,7 +92,6 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
 
 
 
