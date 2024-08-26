@@ -14,7 +14,7 @@ export const Onboarding1 = () => {
       try {
         const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
         const userData = await userResponse.json();
-        
+
         if (!userData.user) {
           throw new Error('User data not found');
         }
@@ -28,6 +28,10 @@ export const Onboarding1 = () => {
           userEmail: localStorage.getItem('userEmail'),
           userId: localStorage.getItem('userId')
         });
+
+        if (!localStorage.getItem('userEmail') || !localStorage.getItem('userId')) {
+          throw new Error('Failed to store user data in localStorage');
+        }
 
         const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
@@ -92,6 +96,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 

@@ -13,6 +13,8 @@ export const Onboarding2 = () => {
         const userId = localStorage.getItem('userId');
         const userEmail = localStorage.getItem('userEmail');
 
+        console.log('Retrieved from localStorage:', { userId, userEmail });
+
         if (!userId || !userEmail) {
           throw new Error('User information not found in local storage');
         }
@@ -31,6 +33,8 @@ export const Onboarding2 = () => {
         }
 
         const data = await response.json();
+        console.log('User info fetched:', data);
+
         setUserInfo(data);
       } catch (err) {
         console.error('Error fetching user info:', err);
@@ -44,6 +48,8 @@ export const Onboarding2 = () => {
   const handleContinue = async () => {
     try {
       const userId = localStorage.getItem('userId');
+      console.log('Continuing with userId:', userId);
+
       const response = await fetch('https://somaai.onrender.com/api/user/confirm-onboarding', {
         method: 'POST',
         headers: {
@@ -67,6 +73,8 @@ export const Onboarding2 = () => {
   const handleLater = async () => {
     try {
       const userId = localStorage.getItem('userId');
+      console.log('Skipping with userId:', userId);
+
       const response = await fetch('https://somaai.onrender.com/api/user/skip-onboarding', {
         method: 'POST',
         headers: {
