@@ -19,10 +19,13 @@ export const Onboarding1 = () => {
           throw new Error('User data not found');
         }
 
-        console.log('User data received:', userData);
-
+        // Extract user ID and email
         const userId = userData.user.id;
         const userEmail = userData.user.email;
+
+        // Log user data to console
+        console.log('User ID:', userId);
+        console.log('User Email:', userEmail);
 
         // Store userId and userEmail in localStorage
         localStorage.setItem('userId', userId);
@@ -96,6 +99,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
