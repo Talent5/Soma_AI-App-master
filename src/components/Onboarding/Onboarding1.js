@@ -10,57 +10,61 @@ export const Onboarding1 = () => {
   const [error, setError] = useState(null);
 
   const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
-    if (authResult === 'success') {
-      try {
-        const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
-        const userData = await userResponse.json();
+  if (authResult === 'success') {
+    try {
+      const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
+      const userData = await userResponse.json();
 
-        if (!userData.user) {
-          throw new Error('User data not found');
-        }
+      console.log('User data received:', userData);
 
-        // Extract user ID and email
-        const userId = userData.user.id;
-        const userEmail = userData.user.email;
-
-        // Log user data to console
-        console.log('User ID:', userId);
-        console.log('User Email:', userEmail);
-
-        // Store userId and userEmail in localStorage
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('userEmail', userEmail);
-
-        console.log('LocalStorage after setting:', {
-          userId: localStorage.getItem('userId'),
-          userEmail: localStorage.getItem('userEmail')
-        });
-
-        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, email: userEmail })
-        });
-
-        const profileData = await profileCheckResponse.json();
-        console.log('Profile check response:', profileData);
-
-        if (profileData.profileExists) {
-          navigate('/dashboard');
-        } else if (action === 'signup' || action === 'login') {
-          navigate('/onboarding2');
-        } else {
-          throw new Error('Invalid action');
-        }
-      } catch (err) {
-        console.error('Error during authentication process:', err);
-        setError(err.message || 'An unexpected error occurred during authentication');
+      if (!userData.user) {
+        throw new Error('User data not found');
       }
-    } else if (authResult === 'failure' || errorMessage) {
-      setError(errorMessage || 'Authentication failed');
+
+      // Extract user ID and email
+      const userId = userData.user.id;
+      const userEmail = userData.user.email;
+
+      // Log user data to console
+      console.log('User ID:', userId);
+      console.log('User Email:', userEmail);
+
+      // Store userId and userEmail in localStorage
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('userEmail', userEmail);
+
+      // Retrieve and log values from localStorage
+      console.log('LocalStorage after setting:', {
+        userId: localStorage.getItem('userId'),
+        userEmail: localStorage.getItem('userEmail')
+      });
+
+      const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, email: userEmail })
+      });
+
+      const profileData = await profileCheckResponse.json();
+      console.log('Profile check response:', profileData);
+
+      if (profileData.profileExists) {
+        navigate('/dashboard');
+      } else if (action === 'signup' || action === 'login') {
+        navigate('/onboarding2');
+      } else {
+        throw new Error('Invalid action');
+      }
+    } catch (err) {
+      console.error('Error during authentication process:', err);
+      setError(err.message || 'An unexpected error occurred during authentication');
     }
+  } else if (authResult === 'failure' || errorMessage) {
+    setError(errorMessage || 'Authentication failed');
+  }
   }, [navigate]);
+
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
