@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Metrics } from './Metrics';
 import { Applications } from './Applications';
 
@@ -6,6 +7,7 @@ export const Dashboard = () => {
   const [userName, setUserName] = useState('James'); // Default to "James"
   const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
   const fileInputRef = useRef(null); // Reference to the file input
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     // Retrieve the name and profile picture from local storage
@@ -37,9 +39,13 @@ export const Dashboard = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate('/profile'); // Navigate to the profile page
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-8 mb-4 max-w-sm mx-auto">
-      <div className="flex justify-between items-center pb-2 ">
+      <div className="flex justify-between items-center pb-2">
         <div className="flex items-center">
           <div
             className="w-12 h-12 rounded-full cursor-pointer flex items-center justify-center overflow-hidden"
@@ -57,7 +63,9 @@ export const Dashboard = () => {
               </div>
             )}
           </div>
-          <p className="text-lg font-medium ml-2">Welcome! {userName}</p>
+          <p className="text-lg font-medium ml-2 cursor-pointer" onClick={handleProfileClick}>
+            Welcome! {userName}
+          </p>
         </div>
         <i className="bi bi-bell text-2xl"></i>
       </div>

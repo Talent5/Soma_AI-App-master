@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useState, useEffect } from 'react';
 import {
   Routes,
@@ -8,7 +9,7 @@ import {
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { FormDataProvider } from './components/Onboarding/FormDataContext';
 import { AudioProvider } from './components/Welcome/AudioContext';
-import { ProgressProvider } from './components/Onboarding/ProgressContext'; // Import ProgressProvider
+import { ProgressProvider } from './components/Onboarding/ProgressContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { SplashScreen } from './components/SplashScreen';
 import { Content } from './pages/Content';
@@ -42,8 +43,9 @@ import { Onboarding27 } from './components/Onboarding/Onboarding27';
 import { ReviewAndEdit } from './components/Onboarding/ReviewAndEdit';
 import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
-import { ScholarshipsPage } from "./pages/ScholarshipsPage";
+import { ScholarshipsPage } from './pages/ScholarshipsPage';
 import { DocumentPage } from './pages/DocumentPage';
+import AllRoutes from './routes/AllRoutes'; // Ensure you have this file for managing routes
 import './global.css';
 import './styleguide.css';
 import './App.css';
@@ -137,9 +139,9 @@ function App() {
   ].includes(location.pathname);
 
   return (
-    <GoogleOAuthProvider clientId="630056606819-bmb2vu3tq9oh5149ejp4c9cvgtdgdoe1.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <AudioProvider>
-        <ProgressProvider> {/* Wrap with ProgressProvider */}
+        <ProgressProvider>
           {showSplash ? (
             <SplashScreen />
           ) : (
@@ -179,6 +181,7 @@ function App() {
                 <Route path="/home" element={<Dashboard />} />
                 <Route path="/Scholarships" element={<ScholarshipsPage />} />
                 <Route path="/documents" element={<DocumentPage />} />
+                <Route path="*" element={<AllRoutes />} /> {/* Ensure this handles any route not matched */}
               </Routes>
             </FormDataProvider>
           )}
