@@ -12,7 +12,7 @@ const ProfileScreen = () => {
     ];
 
     return (
-        <div className="p-4">
+        <div className="p-4 bg-slate-50">
             <List items={menuItems} />
         </div>
     );
