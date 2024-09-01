@@ -17,7 +17,7 @@ export const Onboarding1 = () => {
 
         if (!userEmail) {
           // If email is not in localStorage, fetch it from the server
-          const userResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/user`, { credentials: 'include' });
+          const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
           const userData = await userResponse.json();
 
           if (!userData.user) {
@@ -25,7 +25,7 @@ export const Onboarding1 = () => {
           }
 
           // Extract and store the email in localStorage
-          userEmail = userData.data.data;
+          userEmail = userData.data.email; // Assuming the API returns an 'email' field
           localStorage.setItem('userEmail', userEmail);
         }
 
@@ -33,7 +33,7 @@ export const Onboarding1 = () => {
         console.log('User Email from localStorage:', userEmail);
 
         // Check if the user profile exists
-        const profileCheckResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/check-profile`, {
+        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ export const Onboarding1 = () => {
 
   const initiateGoogleAuth = (action) => {
     const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
-    window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?action=${action}&redirect_url=${redirectUrl}`;
+    window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
   return (
@@ -96,6 +96,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
