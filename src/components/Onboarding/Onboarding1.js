@@ -19,26 +19,24 @@ export const Onboarding1 = () => {
           throw new Error('User data not found');
         }
 
-        // Extract user ID and email
+        // Extract user email
         const userEmail = userData.data.data;
 
         // Log user data to console
+        console.log('Signup Successful - User Email:', userEmail);
 
-        console.log('User Email:', userEmail);
-
-        // Store userId and userEmail in localStorage
-
+        // Store userEmail in localStorage
         localStorage.setItem('userEmail', userEmail);
 
         console.log('LocalStorage after setting:', {
-          userEmail: localStorage.getItem('userEmail')
+          userEmail: localStorage.getItem('userEmail'),
         });
 
         const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({email: userEmail })
+          body: JSON.stringify({ email: userEmail }),
         });
 
         const profileData = await profileCheckResponse.json();
@@ -97,6 +95,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
