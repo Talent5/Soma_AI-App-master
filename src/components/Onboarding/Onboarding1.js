@@ -20,19 +20,17 @@ export const Onboarding1 = () => {
         }
 
         // Extract user ID and email
-        const userId = userData.user.id;
-        const userEmail = userData.user.email;
+        const userEmail = userData.data.data;
 
         // Log user data to console
-        console.log('User ID:', userId);
+
         console.log('User Email:', userEmail);
 
         // Store userId and userEmail in localStorage
-        localStorage.setItem('userId', userId);
+
         localStorage.setItem('userEmail', userEmail);
 
         console.log('LocalStorage after setting:', {
-          userId: localStorage.getItem('userId'),
           userEmail: localStorage.getItem('userEmail')
         });
 
@@ -40,7 +38,7 @@ export const Onboarding1 = () => {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, email: userEmail })
+          body: JSON.stringify({email: userEmail })
         });
 
         const profileData = await profileCheckResponse.json();
