@@ -7,10 +7,12 @@ export const Onboarding2 = () => {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    const checkVerification = async () => {
+    const checkVerification = () => {
       const userEmail = localStorage.getItem('userEmail');
       const isVerified = localStorage.getItem('isVerified');
       
+      console.log('Checking verification:', { userEmail, isVerified });
+
       if (!userEmail || isVerified !== 'true') {
         console.log('User not verified. Redirecting to signup page.');
         navigate('/onboarding1');
