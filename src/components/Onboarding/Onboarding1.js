@@ -8,39 +8,39 @@ export const Onboarding1 = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+
+  useEffect(() => {
+    // Check localStorage for existing email on component mount
+    const storedEmail = localStorage.getItem('userEmail');
+    if (storedEmail) {
+      setUserEmail(storedEmail);
+      console.log('User email found in localStorage:', storedEmail);
+    }
+  }, []);
 
   const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
     if (authResult === 'success') {
       try {
-        // First, check if the email is already stored in localStorage
-        let userEmail = localStorage.getItem('userEmail');
-
-        if (!userEmail) {
-          // If email is not in localStorage, fetch it from the server
-          const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
-          const userData = await userResponse.json();
-
-          if (!userData.user) {
-            throw new Error('User data not found');
-          }
-
-          // Extract and store the email in localStorage
-          userEmail = userData.data.email; // Assuming the API returns an 'email' field
-          localStorage.setItem('userEmail', userEmail);
+        const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
+        const userData = await userResponse.json();
+        if (!userData.user) {
+          throw new Error('User data not found');
         }
 
-        // Log userEmail to ensure it's correctly stored
-        console.log('User Email from localStorage:', userEmail);
+        const email = userData.data.data;
+        setUserEmail(email);
+        localStorage.setItem('userEmail', email);
+        console.log('User successfully authenticated. Email stored in localStorage:', email);
 
-        // Check if the user profile exists
         const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userEmail }),
+          body: JSON.stringify({ email })
         });
-
         const profileData = await profileCheckResponse.json();
+        console.log('Profile check response:', profileData);
 
         if (profileData.profileExists) {
           navigate('/home');
@@ -50,9 +50,8 @@ export const Onboarding1 = () => {
           throw new Error('Invalid action');
         }
       } catch (err) {
-        // Handle errors gracefully
         console.error('Error during authentication process:', err);
-        setError('An unexpected error occurred during authentication');
+        setError(err.message || 'An unexpected error occurred during authentication');
       }
     } else if (authResult === 'failure' || errorMessage) {
       setError(errorMessage || 'Authentication failed');
@@ -64,7 +63,6 @@ export const Onboarding1 = () => {
     const authResult = urlParams.get('auth');
     const errorMessage = urlParams.get('error');
     const action = urlParams.get('action');
-
     handleAuthResult(authResult, errorMessage, action);
   }, [handleAuthResult, location]);
 
@@ -73,23 +71,27 @@ export const Onboarding1 = () => {
     window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
+  const verifyLocalStorage = () => {
+    const storedEmail = localStorage.getItem('userEmail');
+    console.log('Verifying localStorage - Stored email:', storedEmail);
+    return storedEmail;
+  };
+
   return (
     <section className="text-center mt-8">
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <button
-        className="bg-[#1E1548] text-white rounded-full w-full px-16 py-2 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95"
-        onClick={() => initiateGoogleAuth('signup')}
-        aria-label="Sign up with Google"
-      >
+      {userEmail && (
+        <div>
+          <p className="text-green-500 mb-2">Successfully authenticated: {userEmail}</p>
+          <p className="text-blue-500 mb-4">Email in localStorage: {verifyLocalStorage() || 'Not found'}</p>
+        </div>
+      )}
+      <button className="bg-[#1E1548] text-white rounded-full w-full px-16 py-2 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95" onClick={() => initiateGoogleAuth('signup')} aria-label="Sign up with Google">
         <img src={IconImage} alt="Google Icon" className="mr-2" />
         Sign up with Google
       </button>
       <p className="text-gray-500 mb-4">Already have an account?</p>
-      <button
-        className="text-[#1E1548] rounded-full px-16 py-3 flex items-center justify-center border border-blue-800 transition-transform transform hover:bg-[#e0e0e0] active:bg-[#d0d0d0] active:scale-95"
-        onClick={() => initiateGoogleAuth('login')}
-        aria-label="Log in with Google"
-      >
+      <button className="text-[#1E1548] rounded-full px-16 py-3 flex items-center justify-center border border-blue-800 transition-transform transform hover:bg-[#e0e0e0] active:bg-[#d0d0d0] active:scale-95" onClick={() => initiateGoogleAuth('login')} aria-label="Log in with Google">
         <img src={IconImage} alt="Google Icon" className="mr-2" />
         Log in with Google
       </button>
