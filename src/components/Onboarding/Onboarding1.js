@@ -12,27 +12,28 @@ export const Onboarding1 = () => {
   const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
     if (authResult === 'success') {
       try {
-        const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
-        const userData = await userResponse.json();
+        // First, check if the email is already stored in localStorage
+        let userEmail = localStorage.getItem('userEmail');
 
-        if (!userData.user) {
-          throw new Error('User data not found');
+        if (!userEmail) {
+          // If email is not in localStorage, fetch it from the server
+          const userResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/auth/user`, { credentials: 'include' });
+          const userData = await userResponse.json();
+
+          if (!userData.user) {
+            throw new Error('User data not found');
+          }
+
+          // Extract and store the email in localStorage
+          userEmail = userData.data.data;
+          localStorage.setItem('userEmail', userEmail);
         }
 
-        // Extract user email
-        const userEmail = userData.data.data;
+        // Log userEmail to ensure it's correctly stored
+        console.log('User Email from localStorage:', userEmail);
 
-        // Log user data to console
-        console.log('Signup Successful - User Email:', userEmail);
-
-        // Store userEmail in localStorage
-        localStorage.setItem('userEmail', userEmail);
-
-        console.log('LocalStorage after setting:', {
-          userEmail: localStorage.getItem('userEmail'),
-        });
-
-        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
+        // Check if the user profile exists
+        const profileCheckResponse = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/check-profile`, {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -40,7 +41,6 @@ export const Onboarding1 = () => {
         });
 
         const profileData = await profileCheckResponse.json();
-        console.log('Profile check response:', profileData);
 
         if (profileData.profileExists) {
           navigate('/home');
@@ -50,8 +50,9 @@ export const Onboarding1 = () => {
           throw new Error('Invalid action');
         }
       } catch (err) {
+        // Handle errors gracefully
         console.error('Error during authentication process:', err);
-        setError(err.message || 'An unexpected error occurred during authentication');
+        setError('An unexpected error occurred during authentication');
       }
     } else if (authResult === 'failure' || errorMessage) {
       setError(errorMessage || 'Authentication failed');
@@ -69,7 +70,7 @@ export const Onboarding1 = () => {
 
   const initiateGoogleAuth = (action) => {
     const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
-    window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
+    window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
   return (
@@ -95,6 +96,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
