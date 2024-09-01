@@ -11,19 +11,47 @@ export const Onboarding1 = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [signupStatus, setSignupStatus] = useState(null);
 
+  const fetchUserData = useCallback(async () => {
+    try {
+      const userResponse = await fetch('https://somaai.onrender.com/auth/user', { 
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await userResponse.json();
+      console.log('User data received:', userData);
+
+      if (!userData.user) {
+        throw new Error('User data not found in response');
+      }
+
+      const email = userData.user.email;  // Adjust this based on the actual structure of your response
+      setUserEmail(email);
+      localStorage.setItem('userEmail', email);
+      console.log('User email stored in localStorage:', email);
+
+      return email;
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+      setError(err.message || 'An unexpected error occurred while fetching user data');
+      return null;
+    }
+  }, []);
+
   const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
     if (authResult === 'success') {
       try {
-        const userResponse = await fetch('https://somaai.onrender.com/auth/user', { credentials: 'include' });
-        const userData = await userResponse.json();
-        if (!userData.user) {
-          throw new Error('User data not found');
+        const email = await fetchUserData();
+        if (!email) {
+          throw new Error('Failed to fetch user email');
         }
-
-        const email = userData.data.data;
-        setUserEmail(email);
-        localStorage.setItem('userEmail', email);
-        console.log('User authenticated. Email:', email);
 
         const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
           method: 'POST',
@@ -31,7 +59,13 @@ export const Onboarding1 = () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email })
         });
+        
+        if (!profileCheckResponse.ok) {
+          throw new Error('Failed to check user profile');
+        }
+
         const profileData = await profileCheckResponse.json();
+        console.log('Profile check response:', profileData);
 
         if (profileData.profileExists) {
           setSignupStatus('Profile already exists');
@@ -54,7 +88,7 @@ export const Onboarding1 = () => {
       setSignupStatus('Signup failed');
       console.log('Signup failed. Reason:', errorMessage || 'Unknown error');
     }
-  }, [navigate]);
+  }, [navigate, fetchUserData]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
