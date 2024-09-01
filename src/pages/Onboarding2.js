@@ -7,14 +7,20 @@ export const Onboarding2 = () => {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    const userEmail = localStorage.getItem('userEmail');
-    if (!userEmail) {
-      console.log('User not verified. Redirecting to signup page.');
-      navigate('/onboarding1');  // Assuming '/onboarding1' is your signup page route
-    } else {
-      console.log('User verified. Email:', userEmail);
-      setIsVerified(true);
-    }
+    const checkVerification = async () => {
+      const userEmail = localStorage.getItem('userEmail');
+      const isVerified = localStorage.getItem('isVerified');
+      
+      if (!userEmail || isVerified !== 'true') {
+        console.log('User not verified. Redirecting to signup page.');
+        navigate('/onboarding1');
+      } else {
+        console.log('User verified. Email:', userEmail);
+        setIsVerified(true);
+      }
+    };
+
+    checkVerification();
   }, [navigate]);
 
   const handleContinue = () => {
@@ -26,7 +32,7 @@ export const Onboarding2 = () => {
   };
 
   if (!isVerified) {
-    return null;  // Or you could return a loading spinner here
+    return <div>Verifying user...</div>;
   }
 
   return (
@@ -37,8 +43,6 @@ export const Onboarding2 = () => {
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
             Account successfully created. To get your profile fully set up, you'll need to provide the following details:
           </h1>
-          <p className="mb-4 text-gray-600">
-          </p>
           <ul className="list-disc list-inside mb-6 text-gray-600">
             <li>Personal information</li>
             <li>Educational background</li>

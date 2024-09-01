@@ -74,6 +74,7 @@ export const Onboarding1 = () => {
         } else if (action === 'signup' || action === 'login') {
           setSignupStatus('Signup successful');
           console.log('Signup successful for:', email);
+          localStorage.setItem('isVerified', 'true');  // Add this line
           setTimeout(() => navigate('/onboarding2'), 2000);
         } else {
           throw new Error('Invalid action');
@@ -124,7 +125,6 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
 
 
 
