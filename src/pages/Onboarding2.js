@@ -12,10 +12,9 @@ export const Onboarding2 = () => {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
-        // Fetch the email from the success endpoint
+        // Fetch the email from the success endpoint without credentials
         const response = await fetch('https://somaai.onrender.com/auth/google/success', {
           method: 'GET',
-          credentials: 'include', // Ensure credentials are included
           headers: { 'Accept': 'application/json' },
         });
 
@@ -37,7 +36,6 @@ export const Onboarding2 = () => {
         // Check if the user is new or existing
         const profileResponse = await fetch(`https://somaai.onrender.com/api/user?email=${encodeURIComponent(email)}`, {
           method: 'GET',
-          credentials: 'include',
           headers: { 'Accept': 'application/json' },
         });
 
@@ -127,3 +125,4 @@ export const Onboarding2 = () => {
     </div>
   );
 };
+
