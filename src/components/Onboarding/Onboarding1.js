@@ -21,6 +21,7 @@ export const Onboarding1 = () => {
     } else if (authResult === 'failure' || errorMessage) {
       setError(errorMessage || 'Authentication failed');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const verifySignup = async () => {
