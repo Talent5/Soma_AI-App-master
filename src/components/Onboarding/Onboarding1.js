@@ -11,50 +11,96 @@ export const Onboarding1 = () => {
   const [userEmail, setUserEmail] = useState(null);
   const [signupStatus, setSignupStatus] = useState(null);
 
-  const handleGoogleAuthSuccess = useCallback(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const email = urlParams.get('data');
-    
-    if (email) {
-      console.log('Google Auth Success. Email:', email);
+  const fetchUserData = useCallback(async () => {
+    try {
+      const userResponse = await fetch('https://somaai.onrender.com/auth/user', { 
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!userResponse.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+
+      const userData = await userResponse.json();
+      console.log('User data received:', userData);
+
+      if (!userData.user) {
+        throw new Error('User data not found in response');
+      }
+
+      const email = userData.user.email;  // Adjust this based on the actual structure of your response
       setUserEmail(email);
       localStorage.setItem('userEmail', email);
-      localStorage.setItem('isVerified', 'true');
-      setSignupStatus('Signup successful');
-      setTimeout(() => navigate('/onboarding2'), 2000);
-    } else {
-      console.error('No email found in Google Auth Success URL');
-      setError('Authentication failed: No email received');
-    }
-  }, [navigate]);
+      console.log('User email stored in localStorage:', email);
 
-  useEffect(() => {
-    if (window.location.pathname === '/auth/google/success') {
-      handleGoogleAuthSuccess();
-    } else {
-      const urlParams = new URLSearchParams(window.location.search);
-      const authResult = urlParams.get('auth');
-      const errorMessage = urlParams.get('error');
-      const action = urlParams.get('action');
-      if (authResult || errorMessage || action) {
-        handleAuthResult(authResult, errorMessage, action);
-      }
+      return email;
+    } catch (err) {
+      console.error('Error fetching user data:', err);
+      setError(err.message || 'An unexpected error occurred while fetching user data');
+      return null;
     }
-  }, [handleGoogleAuthSuccess, location]);
+  }, []);
 
-  const handleAuthResult = useCallback((authResult, errorMessage, action) => {
+  const handleAuthResult = useCallback(async (authResult, errorMessage, action) => {
     if (authResult === 'success') {
-      setSignupStatus('Signup successful');
-      setTimeout(() => navigate('/onboarding2'), 2000);
+      try {
+        const email = await fetchUserData();
+        if (!email) {
+          throw new Error('Failed to fetch user email');
+        }
+
+        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        if (!profileCheckResponse.ok) {
+          throw new Error('Failed to check user profile');
+        }
+
+        const profileData = await profileCheckResponse.json();
+        console.log('Profile check response:', profileData);
+
+        if (profileData.profileExists) {
+          setSignupStatus('Profile already exists');
+          console.log('Profile already exists for:', email);
+          setTimeout(() => navigate('/home'), 2000);
+        } else if (action === 'signup' || action === 'login') {
+          setSignupStatus('Signup successful');
+          console.log('Signup successful for:', email);
+          localStorage.setItem('isVerified', 'true');  // Add this line
+          setTimeout(() => navigate('/onboarding2'), 2000);
+        } else {
+          throw new Error('Invalid action');
+        }
+      } catch (err) {
+        console.error('Error during authentication process:', err);
+        setError(err.message || 'An unexpected error occurred during authentication');
+        setSignupStatus('Signup failed');
+      }
     } else if (authResult === 'failure' || errorMessage) {
       setError(errorMessage || 'Authentication failed');
       setSignupStatus('Signup failed');
       console.log('Signup failed. Reason:', errorMessage || 'Unknown error');
     }
-  }, [navigate]);
+  }, [navigate, fetchUserData]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const authResult = urlParams.get('auth');
+    const errorMessage = urlParams.get('error');
+    const action = urlParams.get('action');
+    handleAuthResult(authResult, errorMessage, action);
+  }, [handleAuthResult, location]);
 
   const initiateGoogleAuth = (action) => {
-    const redirectUrl = encodeURIComponent(`${window.location.origin}/onboarding1`);
+    const redirectUrl = encodeURIComponent(`${window.location.origin}${location.pathname}`);
     window.location.href = `https://somaai.onrender.com/auth/google?action=${action}&redirect_url=${redirectUrl}`;
   };
 
