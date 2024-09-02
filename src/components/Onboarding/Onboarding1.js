@@ -39,13 +39,14 @@ export const Onboarding1 = () => {
         throw new Error('Failed to verify signup');
       }
 
-      const userData = await response.json();
+      const result = await response.json();
       
-      if (!userData.user || !userData.user.email) {
+      if (!result.data) {
         throw new Error('User data not found');
       }
 
-      localStorage.setItem('userEmail', userData.user.email);
+      const userEmail = result.data;
+      localStorage.setItem('userEmail', userEmail);
       navigate('/onboarding2');
     } catch (err) {
       console.error('Error verifying signup:', err);
@@ -64,7 +65,14 @@ export const Onboarding1 = () => {
   };
 
   if (isLoading) {
-    return <div>Verifying signup...</div>;
+    return (
+      <div className="text-center mt-8">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p>Verifying signup...</p>
+      </div>
+    );
   }
 
   return (
@@ -90,6 +98,7 @@ export const Onboarding1 = () => {
     </section>
   );
 };
+
 
 
 
