@@ -5,24 +5,34 @@ import Header from '../components/Welcome/Header';
 export const Onboarding2 = () => {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState(false);
+  const [userEmail, setUserEmail] = useState(null);
 
   useEffect(() => {
-    const checkVerification = () => {
-      const userEmail = localStorage.getItem('userEmail');
-      const isVerified = localStorage.getItem('isVerified');
-      
-      console.log('Checking verification:', { userEmail, isVerified });
+    const checkAuthAndOnboarding = () => {
+      const email = localStorage.getItem('userEmail');
+      const isVerified = localStorage.getItem('isVerified') === 'true';
+      const isSigningUp = localStorage.getItem('isSigningUp') === 'true';
+      const isOnboarded = localStorage.getItem('isOnboarded') === 'true';
 
-      if (!userEmail || isVerified !== 'true') {
-        console.log('User not verified. Redirecting to signup page.');
-        navigate('/onboarding1');
+      console.log('Checking auth and onboarding:', { email, isVerified, isSigningUp, isOnboarded });
+
+      if (!email || !isVerified) {
+        console.log('User not authenticated. Redirecting to signup page.');
+        navigate('/');
+      } else if (!isSigningUp) {
+        console.log('User is not in signup process. Redirecting to home.');
+        navigate('/home');
+      } else if (isOnboarded) {
+        console.log('User already onboarded. Redirecting to home.');
+        navigate('/home');
       } else {
-        console.log('User verified. Email:', userEmail);
+        console.log('User verified and in onboarding process. Email:', email);
         setIsVerified(true);
+        setUserEmail(email);
       }
     };
 
-    checkVerification();
+    checkAuthAndOnboarding();
   }, [navigate]);
 
   const handleContinue = () => {
@@ -30,6 +40,8 @@ export const Onboarding2 = () => {
   };
 
   const handleLater = () => {
+    localStorage.setItem('isOnboarded', 'true');
+    localStorage.removeItem('isSigningUp');
     navigate('/home');
   };
 
@@ -43,7 +55,7 @@ export const Onboarding2 = () => {
       <main className="flex-grow flex items-center justify-center bg-transparent">
         <div className="max-w-2xl w-full bg-transparent p-8 rounded-lg ">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
-            Account successfully created. To get your profile fully set up, you'll need to provide the following details:
+            Welcome, {userEmail}! To get your profile fully set up, you'll need to provide the following details:
           </h1>
           <ul className="list-disc list-inside mb-6 text-gray-600">
             <li>Personal information</li>
