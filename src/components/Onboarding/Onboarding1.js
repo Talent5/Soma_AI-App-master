@@ -53,7 +53,7 @@ export const Onboarding1 = () => {
           throw new Error('Failed to fetch user email');
         }
 
-        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/check-profile', {
+        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
