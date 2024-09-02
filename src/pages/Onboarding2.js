@@ -15,12 +15,12 @@ export const Onboarding2 = () => {
         // Fetch the email from the success endpoint
         const response = await fetch('https://somaai.onrender.com/auth/google/success', {
           method: 'GET',
-          credentials: 'include',
+          credentials: 'include', // Ensure credentials are included
           headers: { 'Accept': 'application/json' },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to retrieve user email');
+          throw new Error(`Failed to retrieve user email: ${response.statusText}`);
         }
 
         const data = await response.json();
