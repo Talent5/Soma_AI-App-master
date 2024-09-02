@@ -14,7 +14,7 @@ export const Onboarding1 = () => {
 
   const fetchUserData = useCallback(async () => {
     try {
-      const userResponse = await fetch('https://somaai.onrender.com/auth/user', { 
+      const userResponse = await fetch('https://somaai.onrender.com/auth/google/success', { 
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
@@ -29,11 +29,11 @@ export const Onboarding1 = () => {
       const userData = await userResponse.json();
       console.log('User data received:', userData);
 
-      if (!userData.user) {
+      if (!userData.data) {
         throw new Error('User data not found in response');
       }
 
-      const email = userData.user.email;
+      const email = userData.data.data;
       setUserEmail(email);
       localStorage.setItem('userEmail', email);
       console.log('User email stored in localStorage:', email);
@@ -54,7 +54,7 @@ export const Onboarding1 = () => {
           throw new Error('Failed to fetch user email');
         }
 
-        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user', {
+        const profileCheckResponse = await fetch('https://somaai.onrender.com/api/user/', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
