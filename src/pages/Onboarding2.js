@@ -11,33 +11,44 @@ export const Onboarding2 = () => {
 
   useEffect(() => {
     const checkUserStatus = async () => {
-      const email = localStorage.getItem('userEmail');
-      if (!email) {
-        console.log('No user email found. Redirecting to signup page.');
-        navigate('/');
-        return;
-      }
-
-      setUserEmail(email);
-
       try {
-        const response = await fetch('https://somaai.onrender.com/api/user', {
-          method: 'POST',
+        // Fetch the email from the success endpoint
+        const response = await fetch('https://somaai.onrender.com/auth/google/success', {
+          method: 'GET',
           credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
+          headers: { 'Accept': 'application/json' },
         });
 
         if (!response.ok) {
+          throw new Error('Failed to retrieve user email');
+        }
+
+        const data = await response.json();
+        const email = data.data;
+
+        if (!email) {
+          throw new Error('User email not found');
+        }
+
+        // Store the email in localStorage
+        localStorage.setItem('userEmail', email);
+        setUserEmail(email);
+
+        // Check if the user is new or existing
+        const profileResponse = await fetch(`https://somaai.onrender.com/api/user?email=${encodeURIComponent(email)}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' },
+        });
+
+        if (!profileResponse.ok) {
           throw new Error('Failed to check user profile');
         }
 
-        const profileData = await response.json();
-        console.log('Profile check response:', profileData);
-
+        const profileData = await profileResponse.json();
         setIsNewUser(!profileData.profileExists);
       } catch (err) {
-        console.error('Error checking user profile:', err);
+        console.error('Error:', err);
         setError(err.message || 'An unexpected error occurred');
       } finally {
         setIsLoading(false);
@@ -61,18 +72,28 @@ export const Onboarding2 = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}. Please try logging in again.</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-red-500">{error}. Please try logging in again.</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow flex items-center justify-center bg-transparent">
-        <div className="max-w-2xl w-full bg-transparent p-8 rounded-lg ">
+        <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
             {isNewUser 
               ? `Welcome, ${userEmail}! Let's get your profile set up.`
