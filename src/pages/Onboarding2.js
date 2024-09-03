@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '../components/Welcome/Header';
 
 export const Onboarding2 = () => {
@@ -10,50 +11,26 @@ export const Onboarding2 = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        // Fetch the email from the success endpoint without credentials
-        const response = await fetch('https://somaai.onrender.com/auth/google/success', {
-          method: 'PATCH',
-          headers: { 'Accept': 'application/json' },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to retrieve user email: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        const email = data.data;
-
-        if (!email) {
-          throw new Error('User email not found');
-        }
-
-        // Store the email in localStorage
-        localStorage.setItem('userEmail', email);
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const email = user.email;
         setUserEmail(email);
+        localStorage.setItem('userEmail', email);
 
         // Check if the user is new or existing
-        const profileResponse = await fetch(`https://somaai.onrender.com/api/user?email=${encodeURIComponent(email)}`, {
-          method: 'PATCH',
-          headers: { 'Accept': 'application/json' },
-        });
+        const metadata = user.metadata;
+        const isUserNew = metadata.creationTime === metadata.lastSignInTime;
+        setIsNewUser(isUserNew);
 
-        if (!profileResponse.ok) {
-          throw new Error('Failed to check user profile');
-        }
-
-        const profileData = await profileResponse.json();
-        setIsNewUser(!profileData.profileExists);
-      } catch (err) {
-        console.error('Error:', err);
-        setError(err.message || 'An unexpected error occurred');
-      } finally {
         setIsLoading(false);
+      } else {
+        setError('User not signed in');
+        navigate('/login'); // Redirect to login if not signed in
       }
-    };
+    });
 
-    checkUserStatus();
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, [navigate]);
 
   const handleContinue = () => {
@@ -91,14 +68,14 @@ export const Onboarding2 = () => {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow flex items-center justify-center bg-transparent">
-        <div className="max-w-2xl w-full bg-white p-8 rounded-lg shadow-lg">
+        <div className="max-w-2xl w-full p-8">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
             {isNewUser 
-              ? `Welcome, ${userEmail}! Let's get your profile set up.`
+              ? `Account successfully created, now to get your profile fully set up, you’ll need to provide the following details:`
               : `Welcome back, ${userEmail}! Would you like to update your profile?`}
           </h1>
           {isNewUser && (
-            <ul className="list-disc list-inside mb-6 text-gray-600">
+            <ul className="list-disc list-inside mb-6 text-gray-700">
               <li>Personal information</li>
               <li>Educational background</li>
               <li>Field of study</li>
@@ -125,4 +102,5 @@ export const Onboarding2 = () => {
     </div>
   );
 };
+
 

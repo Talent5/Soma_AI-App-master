@@ -13,6 +13,7 @@
     "countries-list": "^3.1.1",
     "downshift": "^9.0.8",
     "express-session": "^1.18.0",
+    "firebase": "^10.13.1",
     "google-auth-library": "^9.11.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
