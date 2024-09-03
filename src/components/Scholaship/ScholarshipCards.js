@@ -1,31 +1,30 @@
 import React from 'react';
-import ScholarshipItem from './ScholarshipItem';
+import image from "../assets/logo192.png";
 
-const ScholarshipCards = ({ scholarships }) => {
+const placeholderImage = {image}; // URL of the placeholder image
+
+export const ScholarshipCards = ({ scholarships }) => {
   return (
-    <div className="bg-white p-2 rounded-lg max-w-full">
-      {scholarships.length > 0 ? (
-        scholarships.map((scholarship, index) => (
-          <div key={scholarship.title + index}>
-            <ScholarshipItem
-              logo={scholarship.logo || '/placeholder-icon.png'}
-              title={scholarship.title}
-              amount={scholarship.amount}
-              deadline={scholarship.deadline}
-            />
-            {index < scholarships.length - 1 && (
-              <hr className="border-t border-gray-600 my-4" />
-            )}
+    <div className="space-y-4">
+      {scholarships.map((scholarship) => (
+        <div key={scholarship.id} className="p-4 flex items-start">
+          <img
+            src={scholarship.logo || placeholderImage}
+            alt={scholarship.title}
+            className="w-24 h-24 object-cover rounded-full mr-4"
+          />
+          <div>
+            <h2 className="text-lg font-semibold">{scholarship.title}</h2>
+            <p className="text-gray-600">Amount: ${scholarship.amount}</p>
+            <p className="text-gray-600">Deadline: {new Date(scholarship.deadline).toLocaleDateString()}</p>
           </div>
-        ))
-      ) : (
-        <p className="text-center text-gray-600">No scholarships found.</p>
-      )}
+        </div>
+      ))}
     </div>
   );
 };
 
-export default ScholarshipCards;
+
 
 
 
