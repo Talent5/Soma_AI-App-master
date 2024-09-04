@@ -17,28 +17,22 @@ export const Onboarding2 = () => {
         const email = user.email;
         setUserEmail(email);
         localStorage.setItem('userEmail', email);
-
         // Check if the user is new or existing
         const metadata = user.metadata;
         const isUserNew = metadata.creationTime === metadata.lastSignInTime;
         setIsNewUser(isUserNew);
-
         setIsLoading(false);
       } else {
         setError('User not signed in');
-        navigate('/login'); // Redirect to login if not signed in
+        navigate('/onboarding1'); // Redirect to login if not signed in
       }
     });
-
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, [navigate]);
 
   const handleContinue = () => {
-    if (isNewUser) {
-      navigate('/onboarding3');
-    } else {
-      navigate('/home');
-    }
+    // Always navigate to onboarding3, regardless of user status
+    navigate('/onboarding3');
   };
 
   const handleLater = () => {
@@ -70,19 +64,17 @@ export const Onboarding2 = () => {
       <main className="flex-grow flex items-center justify-center bg-transparent">
         <div className="max-w-2xl w-full p-8">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
-            {isNewUser 
-              ? `Account successfully created, now to get your profile fully set up, you’ll need to provide the following details:`
-              : `Welcome back, ${userEmail}! Would you like to update your profile?`}
+            {isNewUser
+              ? `Account successfully created, now to get your profile fully set up, you'll need to provide the following details:`
+              : `Welcome back, ${userEmail}! Let's update your profile information:`}
           </h1>
-          {isNewUser && (
-            <ul className="list-disc list-inside mb-6 text-gray-700">
-              <li>Personal information</li>
-              <li>Educational background</li>
-              <li>Field of study</li>
-              <li>Extracurricular activities</li>
-              <li>Financial information</li>
-            </ul>
-          )}
+          <ul className="list-disc list-inside mb-6 text-gray-700">
+            <li>Personal information</li>
+            <li>Educational background</li>
+            <li>Field of study</li>
+            <li>Extracurricular activities</li>
+            <li>Financial information</li>
+          </ul>
           <div className="flex flex-col space-y-4">
             <button
               onClick={handleContinue}
@@ -102,5 +94,4 @@ export const Onboarding2 = () => {
     </div>
   );
 };
-
 

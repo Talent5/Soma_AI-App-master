@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import PropTypes from 'prop-types';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { useState } from 'react';

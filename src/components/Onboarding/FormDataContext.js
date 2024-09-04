@@ -1,4 +1,7 @@
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { db } from '../config/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const FormDataContext = createContext();
 
@@ -23,7 +26,7 @@ const initialFormState = {
   highSchoolName: '',
   gpa: '',
   educationLevel: '',
-  cv: {},
+  cv: {}, // This will hold the file object initially
   userId: '',
 };
 
@@ -46,7 +49,6 @@ export const FormDataProvider = ({ children }) => {
       localStorage.setItem('formData', JSON.stringify(formData));
     };
 
-    // Debounce the save operation
     const timeoutId = setTimeout(saveData, 500);
 
     return () => clearTimeout(timeoutId);
@@ -60,30 +62,36 @@ export const FormDataProvider = ({ children }) => {
   }, []);
 
   const submitFormData = useCallback(async () => {
-    try {
-      const response = await fetch('https://somaai.onrender.com/api/user/update', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Origin': window.location.origin,
-        },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
+    const storage = getStorage();
+    let cvDownloadURL = null;
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server error: ${response.status}`);
+    try {
+      // If there's a CV file, upload it to Firebase Storage
+      if (formData.cv && formData.cv.name) {
+        const cvRef = ref(storage, `cvs/${formData.userId}_${formData.cv.name}`);
+        const uploadResult = await uploadBytes(cvRef, formData.cv);
+
+        // Get the download URL for the uploaded file
+        cvDownloadURL = await getDownloadURL(uploadResult.ref);
       }
 
-      const responseData = await response.json();
-      console.log('Submission successful:', responseData);
+      // Prepare data to store in Firestore, including the CV download URL if it exists
+      const formDataToSave = {
+        ...formData,
+        cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
+      };
+
+      // Save form data to Firestore
+      const docRef = doc(db, 'users', formData.userId);
+      await setDoc(docRef, formDataToSave);
+
+      console.log('Submission successful');
 
       // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
       setFormData(initialFormState);
 
-      return { success: true, data: responseData };
+      return { success: true };
     } catch (error) {
       console.error('Error submitting form data:', error);
       return { success: false, error: error.message };
