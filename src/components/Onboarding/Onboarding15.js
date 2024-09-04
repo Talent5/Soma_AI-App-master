@@ -35,12 +35,9 @@ export const Onboarding15 = () => {
   };
 
   const handleContinue = () => {
-    if (graduationDate) {
+
       memoizedUpdateFormData({ ...formData, graduationDate });
       navigate('/onboarding16'); // Ensure this route is configured correctly
-    } else {
-      alert('Please select a graduation date before continuing.');
-    }
   };
 
   return (

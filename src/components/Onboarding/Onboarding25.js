@@ -62,9 +62,9 @@ export const Onboarding25 = () => {
           onEdit={handleEdit}
         />
       ) : (
-        <div className="button-group">
+        <div className="">
           <button
-            className="continue-button"
+            className="continue-button px-4"
             onClick={handleReview}
             disabled={isSubmitting}
           >

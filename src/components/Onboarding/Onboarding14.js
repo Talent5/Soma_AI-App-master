@@ -28,14 +28,10 @@ export const Onboarding14 = () => {
   };
 
   const handleContinue = () => {
-    if (!isNaN(gpa) && gpa.trim() !== '') {
       updateFormData({ ...formData, gpa });
       // Log the complete form data for debugging
       console.log('Form Data:', { ...formData, gpa });
       navigate('/onboarding15'); // Navigate to the next step
-    } else {
-      alert('Please enter a valid GPA.');
-    }
   };
 
   return (
