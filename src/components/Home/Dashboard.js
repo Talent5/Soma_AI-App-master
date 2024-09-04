@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { Metrics } from './Metrics';
 import { Applications } from './Applications';
+import { db } from '../config/firebase'; // Import the Firestore configuration
+import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
 
 export const Dashboard = () => {
   const [userName, setUserName] = useState('James'); // Default to "James"
@@ -10,15 +12,26 @@ export const Dashboard = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    // Retrieve the name and profile picture from local storage
-    const storedName = localStorage.getItem('firstName');
-    const storedProfilePic = localStorage.getItem('profilePicture');
-    if (storedName) {
-      setUserName(storedName);
-    }
-    if (storedProfilePic) {
-      setProfilePicture(storedProfilePic);
-    }
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem('userId'); // Retrieve userId from local storage
+        if (userId) {
+          const userDocRef = doc(db, 'users', userId);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUserName(userData.firstName || 'James'); // Set the user's first name or default to "James"
+            if (userData.profilePicture) {
+              setProfilePicture(userData.profilePicture); // Set the profile picture if available
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const handleProfilePicChange = (event) => {
@@ -27,7 +40,7 @@ export const Dashboard = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicture(reader.result);
-        localStorage.setItem('profilePicture', reader.result);
+        localStorage.setItem('profilePicture', reader.result); // Optionally store the profile picture locally
       };
       reader.readAsDataURL(file);
     }
@@ -101,6 +114,7 @@ export const Dashboard = () => {
     </div>
   );
 };
+
 
 
 
