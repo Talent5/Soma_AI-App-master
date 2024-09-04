@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -10,20 +10,13 @@ export const Onboarding14 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [gpa, setGpa] = useState(formData.gpa || '');
 
-  const memoizedUpdateFormData = useCallback(
-    (data) => {
-      updateFormData(data);
-    },
-    [updateFormData]
-  );
-
   useEffect(() => {
     // Load form data from localStorage on mount
     const storedFormData = localStorage.getItem('formData');
     if (storedFormData) {
-      memoizedUpdateFormData(JSON.parse(storedFormData));
+      updateFormData(JSON.parse(storedFormData));
     }
-  }, [memoizedUpdateFormData]);
+  }, [updateFormData]);
 
   useEffect(() => {
     // Save form data to localStorage whenever formData or gpa changes
@@ -36,7 +29,9 @@ export const Onboarding14 = () => {
 
   const handleContinue = () => {
     if (!isNaN(gpa) && gpa.trim() !== '') {
-      memoizedUpdateFormData({ ...formData, gpa });
+      updateFormData({ ...formData, gpa });
+      // Log the complete form data for debugging
+      console.log('Form Data:', { ...formData, gpa });
       navigate('/onboarding15'); // Navigate to the next step
     } else {
       alert('Please enter a valid GPA.');
@@ -73,3 +68,4 @@ export const Onboarding14 = () => {
     </div>
   );
 };
+

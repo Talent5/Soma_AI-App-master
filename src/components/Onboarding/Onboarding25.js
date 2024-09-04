@@ -16,16 +16,17 @@ export const Onboarding25 = () => {
   const handleProfileUpdate = useCallback(async () => {
     setIsSubmitting(true);
     setError('');
+
     try {
-      const success = await submitFormData();
+      const { success, error } = await submitFormData();
       if (!success) {
-        throw new Error('Failed to submit form data');
+        throw new Error(error || 'Failed to submit form data');
       }
       console.log('Form data submitted successfully');
       navigate('/home');
-    } catch (error) {
-      console.error('Error submitting form data:', error);
-      setError(error.message || 'An unexpected error occurred');
+    } catch (err) {
+      console.error('Error submitting form data:', err);
+      setError(err.message || 'An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -61,22 +62,26 @@ export const Onboarding25 = () => {
           onEdit={handleEdit}
         />
       ) : (
-        <>
+        <div className="button-group">
           <button
             className="continue-button"
             onClick={handleReview}
             disabled={isSubmitting}
           >
-            Review and Set Up Profile
+            {isSubmitting ? 'Submitting...' : 'Review and Set Up Profile'}
           </button>
-          <button className="later-button" onClick={() => navigate('/home')}>
+          <button
+            className="later-button"
+            onClick={() => navigate('/home')}
+          >
             I will do this later
           </button>
-        </>
+        </div>
       )}
     </div>
   );
 };
+
 
 
 

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useCallback } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -10,19 +10,12 @@ export const Onboarding26 = () => {
   const { formData, updateFormData } = useContext(FormDataContext);
   const [cv, setCv] = useState(formData.cv || null);
 
-  const memoizedUpdateFormData = useCallback(
-    (data) => {
-      updateFormData(data);
-    },
-    [updateFormData]
-  );
-
   useEffect(() => {
     // Ensure the current step is set to 26
     if (formData.currentStep !== 26) {
-      memoizedUpdateFormData({ currentStep: 26 });
+      updateFormData({ currentStep: 26 });
     }
-  }, [formData.currentStep, memoizedUpdateFormData]);
+  }, [formData.currentStep, updateFormData]);
 
   useEffect(() => {
     // Save form data to localStorage whenever formData or CV changes
@@ -35,13 +28,12 @@ export const Onboarding26 = () => {
     const file = e.target.files[0];
     if (file) {
       setCv(file);
+      updateFormData({ cv: file });
     }
   };
 
   const handleContinue = () => {
     if (cv) {
-      // Update formData with the new CV file
-      memoizedUpdateFormData({ cv });
       navigate('/onboarding10');
     } else {
       alert('Please upload your CV before continuing.');
@@ -64,7 +56,7 @@ export const Onboarding26 = () => {
         type="file"
         accept=".pdf,.doc,.docx"
         onChange={handleFileChange}
-        className="file-input" // Apply your custom styling
+        className="file-input"
       />
 
       <button className="continue-button" onClick={handleContinue}>
@@ -76,4 +68,5 @@ export const Onboarding26 = () => {
     </div>
   );
 };
+
 

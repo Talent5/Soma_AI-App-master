@@ -26,8 +26,8 @@ const initialFormState = {
   highSchoolName: '',
   gpa: '',
   educationLevel: '',
-  cv: {}, // This will hold the file object initially
-  userId: '',
+  cv: null, // CV is initially null
+  userId: localStorage.getItem('userId') || '', // Get userId from localStorage if available
 };
 
 export const FormDataProvider = ({ children }) => {
@@ -35,7 +35,12 @@ export const FormDataProvider = ({ children }) => {
     const storedData = localStorage.getItem('formData');
     if (storedData) {
       try {
-        return JSON.parse(storedData);
+        const parsedData = JSON.parse(storedData);
+        return {
+          ...initialFormState,
+          ...parsedData,
+          userId: localStorage.getItem('userId') || parsedData.userId || '', // Ensure userId is set
+        };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
         return initialFormState;
@@ -50,53 +55,65 @@ export const FormDataProvider = ({ children }) => {
     };
 
     const timeoutId = setTimeout(saveData, 500);
-
     return () => clearTimeout(timeoutId);
   }, [formData]);
 
   const updateFormData = useCallback((newData) => {
     setFormData(prevData => ({
       ...prevData,
-      ...newData
+      ...newData,
     }));
   }, []);
 
   const submitFormData = useCallback(async () => {
-    const storage = getStorage();
-    let cvDownloadURL = null;
+  const storage = getStorage();
+  let cvDownloadURL = null;
 
-    try {
-      // If there's a CV file, upload it to Firebase Storage
-      if (formData.cv && formData.cv.name) {
-        const cvRef = ref(storage, `cvs/${formData.userId}_${formData.cv.name}`);
-        const uploadResult = await uploadBytes(cvRef, formData.cv);
-
-        // Get the download URL for the uploaded file
-        cvDownloadURL = await getDownloadURL(uploadResult.ref);
-      }
-
-      // Prepare data to store in Firestore, including the CV download URL if it exists
-      const formDataToSave = {
-        ...formData,
-        cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
-      };
-
-      // Save form data to Firestore
-      const docRef = doc(db, 'users', formData.userId);
-      await setDoc(docRef, formDataToSave);
-
-      console.log('Submission successful');
-
-      // Clear local storage and reset form data after successful submission
-      localStorage.removeItem('formData');
-      setFormData(initialFormState);
-
-      return { success: true };
-    } catch (error) {
-      console.error('Error submitting form data:', error);
-      return { success: false, error: error.message };
+  try {
+    // Ensure userId is available
+    if (!formData.userId) {
+      throw new Error('User ID is missing. Please try again.');
     }
-  }, [formData]);
+
+    // If there's a CV file, upload it to Firebase Storage
+    if (formData.cv) {
+      const fileName = formData.cv.name || 'default_cv_name.pdf'; // Fallback to a default file name if `formData.cv.name` is undefined
+      const cvRef = ref(storage, `cvs/${formData.userId}_${fileName}`);
+      await uploadBytes(cvRef, formData.cv);
+
+      // Get the download URL for the uploaded file
+      cvDownloadURL = await getDownloadURL(cvRef);
+    }
+
+    // Prepare data to store in Firestore, including the CV download URL if it exists
+    const formDataToSave = {
+      ...formData,
+      cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
+    };
+
+    // Remove any fields that are explicitly null or undefined
+    Object.keys(formDataToSave).forEach(key => {
+      if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
+        delete formDataToSave[key];
+      }
+    });
+
+    // Save form data to Firestore
+    const docRef = doc(db, 'users', formData.userId);
+    await setDoc(docRef, formDataToSave, { merge: true });
+
+    console.log('Submission successful');
+
+    // Clear local storage and reset form data after successful submission
+    localStorage.removeItem('formData');
+    setFormData(initialFormState);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error submitting form data:', error);
+    return { success: false, error: error.message };
+  }
+}, [formData]);
 
   const resetFormData = useCallback(() => {
     localStorage.removeItem('formData');
@@ -107,7 +124,7 @@ export const FormDataProvider = ({ children }) => {
     formData,
     updateFormData,
     submitFormData,
-    resetFormData
+    resetFormData,
   }), [formData, updateFormData, submitFormData, resetFormData]);
 
   return (
@@ -116,3 +133,5 @@ export const FormDataProvider = ({ children }) => {
     </FormDataContext.Provider>
   );
 };
+
+

@@ -11,14 +11,6 @@ export const Onboarding1 = () => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Check if the user is already authenticated
-    const userEmail = localStorage.getItem('userEmail');
-    if (userEmail) {
-      navigate('/onboarding2');
-    }
-  }, [navigate]);
-
   const handleGoogleAuth = async () => {
     setError(null);
     setIsLoading(true);
@@ -26,8 +18,9 @@ export const Onboarding1 = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      // Store email in localStorage
+      // Store user email and user ID in local storage
       localStorage.setItem('userEmail', user.email);
+      localStorage.setItem('userId', user.uid);
 
       navigate('/onboarding2');
     } catch (err) {
@@ -72,8 +65,6 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
-
 
 
 

@@ -15,29 +15,30 @@ export const Onboarding2 = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const email = user.email;
+        const userId = user.uid; // Get user ID from Firebase Authentication
         setUserEmail(email);
         localStorage.setItem('userEmail', email);
-        // Check if the user is new or existing
+        localStorage.setItem('userId', userId); // Store user ID in local storage
         const metadata = user.metadata;
         const isUserNew = metadata.creationTime === metadata.lastSignInTime;
         setIsNewUser(isUserNew);
         setIsLoading(false);
       } else {
         setError('User not signed in');
-        navigate('/onboarding1'); // Redirect to login if not signed in
+        navigate('/onboarding1'); // Redirect to onboarding1 if not signed in
       }
     });
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, [navigate]);
 
   const handleContinue = () => {
-    // Always navigate to onboarding3, regardless of user status
-    navigate('/onboarding3');
+    navigate('/onboarding3'); // Always navigate to onboarding3
   };
 
   const handleLater = () => {
     localStorage.setItem('onboardingSeen', 'true');
-    navigate('/home');
+    localStorage.removeItem('userId'); // Remove user ID from local storage
+    navigate('/home'); // Navigate to home if "I'll do this later" is clicked
   };
 
   if (isLoading) {
@@ -65,7 +66,7 @@ export const Onboarding2 = () => {
         <div className="max-w-2xl w-full p-8">
           <h1 className="text-2xl font-bold mb-4 text-gray-800">
             {isNewUser
-              ? `Account successfully created, now to get your profile fully set up, you'll need to provide the following details:`
+              ? `Account successfully created. To get your profile fully set up, you'll need to provide the following details:`
               : `Welcome back, ${userEmail}! Let's update your profile information:`}
           </h1>
           <ul className="list-disc list-inside mb-6 text-gray-700">
@@ -94,4 +95,6 @@ export const Onboarding2 = () => {
     </div>
   );
 };
+
+
 
