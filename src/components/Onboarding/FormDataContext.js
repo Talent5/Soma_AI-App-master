@@ -66,54 +66,54 @@ export const FormDataProvider = ({ children }) => {
   }, []);
 
   const submitFormData = useCallback(async () => {
-  const storage = getStorage();
-  let cvDownloadURL = null;
+    const storage = getStorage();
+    let cvDownloadURL = null;
 
-  try {
-    // Ensure userId is available
-    if (!formData.userId) {
-      throw new Error('User ID is missing. Please try again.');
-    }
-
-    // If there's a CV file, upload it to Firebase Storage
-    if (formData.cv) {
-      const fileName = formData.cv.name || 'default_cv_name.pdf'; // Fallback to a default file name if `formData.cv.name` is undefined
-      const cvRef = ref(storage, `cvs/${formData.userId}_${fileName}`);
-      await uploadBytes(cvRef, formData.cv);
-
-      // Get the download URL for the uploaded file
-      cvDownloadURL = await getDownloadURL(cvRef);
-    }
-
-    // Prepare data to store in Firestore, including the CV download URL if it exists
-    const formDataToSave = {
-      ...formData,
-      cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
-    };
-
-    // Remove any fields that are explicitly null or undefined
-    Object.keys(formDataToSave).forEach(key => {
-      if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
-        delete formDataToSave[key];
+    try {
+      // Ensure userId is available
+      if (!formData.userId) {
+        throw new Error('User ID is missing. Please try again.');
       }
-    });
 
-    // Save form data to Firestore
-    const docRef = doc(db, 'users', formData.userId);
-    await setDoc(docRef, formDataToSave, { merge: true });
+      // If there's a CV file, upload it to Firebase Storage
+      if (formData.cv) {
+        const fileName = formData.cv.name || 'default_cv_name.pdf'; // Fallback to a default file name if `formData.cv.name` is undefined
+        const cvRef = ref(storage, `cvs/${formData.userId}_${fileName}`);
+        await uploadBytes(cvRef, formData.cv);
 
-    console.log('Submission successful');
+        // Get the download URL for the uploaded file
+        cvDownloadURL = await getDownloadURL(cvRef);
+      }
 
-    // Clear local storage and reset form data after successful submission
-    localStorage.removeItem('formData');
-    setFormData(initialFormState);
+      // Prepare data to store in Firestore, including the CV download URL if it exists
+      const formDataToSave = {
+        ...formData,
+        cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
+      };
 
-    return { success: true };
-  } catch (error) {
-    console.error('Error submitting form data:', error);
-    return { success: false, error: error.message };
-  }
-}, [formData]);
+      // Remove any fields that are explicitly null or undefined
+      Object.keys(formDataToSave).forEach(key => {
+        if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
+          delete formDataToSave[key];
+        }
+      });
+
+      // Save form data to Firestore
+      const docRef = doc(db, 'users', formData.userId);
+      await setDoc(docRef, formDataToSave, { merge: true });
+
+      console.log('Submission successful');
+
+      // Clear local storage and reset form data after successful submission
+      localStorage.removeItem('formData');
+      setFormData(initialFormState);
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+      return { success: false, error: error.message };
+    }
+  }, [formData]);
 
   const resetFormData = useCallback(() => {
     localStorage.removeItem('formData');
@@ -133,5 +133,3 @@ export const FormDataProvider = ({ children }) => {
     </FormDataContext.Provider>
   );
 };
-
-
