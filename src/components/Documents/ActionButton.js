@@ -4,6 +4,7 @@ const ActionButton = ({ onUploadClick, onCreateClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const closeDropdown = () => setIsDropdownOpen(false); // Add closeDropdown function
 
   return (
     <div className="relative">
@@ -26,6 +27,12 @@ const ActionButton = ({ onUploadClick, onCreateClick }) => {
             onClick={onCreateClick}
           >
             <i className="bi bi-file-earmark-text mr-2"></i> Create Document
+          </button>
+          <button
+            className="w-full text-left px-4 py-2  hover:bg-gray-100"
+            onClick={closeDropdown} // Add onClick event to close the dropdown
+          >
+            Close
           </button>
         </div>
       )}

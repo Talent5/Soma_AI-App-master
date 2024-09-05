@@ -93,7 +93,7 @@ export const FormDataProvider = ({ children }) => {
 
       // Remove any fields that are explicitly null or undefined
       Object.keys(formDataToSave).forEach(key => {
-        if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
+        if (formDataToSave[key] === null || undefined) {
           delete formDataToSave[key];
         }
       });
@@ -102,7 +102,20 @@ export const FormDataProvider = ({ children }) => {
       const docRef = doc(db, 'users', formData.userId);
       await setDoc(docRef, formDataToSave, { merge: true });
 
-      console.log('Submission successful');
+      // **Send form data to the provided Node.js backend API**
+      const response = await fetch('https://somaai.onrender.com/api/user/ai-model', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formDataToSave),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send data to backend API');
+      }
+
+      console.log('Submission successful to both Firestore and backend');
 
       // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');

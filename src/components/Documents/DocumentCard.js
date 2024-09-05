@@ -1,6 +1,7 @@
 import React from 'react';
 import { deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import EmptyState from './EmptyState';
 
 const DocumentCard = ({ document }) => {
   const handleEdit = () => {
