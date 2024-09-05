@@ -1,66 +1,74 @@
-// DocumentPage.js
 import React, { useState } from 'react';
 import Header from '../components/Documents/Header';
 import DocumentList from '../components/Documents/DocumentList';
+import DocumentUpload from '../components/Documents/DocumentUpload';
+import DocumentCreate from '../components/Documents/DocumentCreate';
 import ActionButton from '../components/Documents/ActionButton';
 import { NavBar } from '../components/NavBar';
 
 export const DocumentPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');    // State to manage search input
+  const [isUploadOpen, setIsUploadOpen] = useState(false);  // State for upload modal
+  const [isCreateOpen, setIsCreateOpen] = useState(false);  // State for create modal
+  // eslint-disable-next-line no-unused-vars
+  const [loading, setLoading] = useState(true); // Loading state for documents
 
-  const documents = [
-    { id: 1, type: "pdf", title: "Statement of Purpose for Wix Scholarship" },
-    { id: 2, type: "doc", title: "Recommendation Letter for MWI Grant" },
-    // Add more documents as needed
-  ];
-
-  // Function to handle search
+  // Handle search input from Header component
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
 
-  // Filter documents based on the search term
-  const filteredDocuments = documents.filter(doc =>
-    doc.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const handleEditDocument = () => {
-    console.log('Edit document');
+  // Handle upload document button click
+  const handleUploadClick = () => {
+    setIsUploadOpen(true);  // Open the upload modal
   };
 
-  const handleDownloadDocument = () => {
-    console.log('Download document');
-  };
-
-  const handleDeleteDocument = () => {
-    console.log('Delete document');
-  };
-
-  const handleRenameDocument = () => {
-    console.log('Rename document');
-  };
-
-  const handleAddButtonClick = () => {
-    console.log('Add button clicked');
+  // Handle create document button click
+  const handleCreateClick = () => {
+    setIsCreateOpen(true);  // Open the create modal
   };
 
   return (
     <div className="flex flex-col h-screen">
+      {/* Header with search functionality */}
       <Header title="Documents" onSearch={handleSearch} />
-      <main className="bg-slate-50 border-1 rounded-lg m-4 flex-grow overflow-auto">
-        <DocumentList
-          documents={filteredDocuments}
-          onEdit={handleEditDocument}
-          onDownload={handleDownloadDocument}
-          onDelete={handleDeleteDocument}
-          onRename={handleRenameDocument}
-        />
+      
+      {/* Main content area for displaying documents */}
+      <main className="rounded-lg m-4 flex-grow overflow-auto">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <p>Loading documents...</p>
+          </div>
+        ) : (
+          <DocumentList searchTerm={searchTerm} />
+        )}
       </main>
-      <ActionButton onClick={handleAddButtonClick} />
+
+      {/* Action Button for Upload and Create document functionality */}
+      <ActionButton
+        onUploadClick={handleUploadClick}
+        onCreateClick={handleCreateClick}
+      />
+
+      {/* Bottom navigation bar */}
       <NavBar />
+
+      {/* Modal for uploading a document */}
+      {isUploadOpen && (
+        <DocumentUpload onClose={() => setIsUploadOpen(false)} />
+      )}
+
+      {/* Modal for creating a new document */}
+      {isCreateOpen && (
+        <DocumentCreate onClose={() => setIsCreateOpen(false)} />
+      )}
     </div>
   );
 };
+
+
+
+
 
 
 

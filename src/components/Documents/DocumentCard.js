@@ -1,38 +1,27 @@
-// DocumentCard.js
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import Modal from './Modal'; // Import the Modal component
+import React from 'react';
 
 const DocumentCard = ({ documentType, documentTitle, onEdit, onDownload, onDelete, onRename }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
   return (
-    <div className="flex items-center p-4 m-6 border-b border-gray-300">
-      <span className="flex-1 text-base text-gray-900 font-medium ml-2">{documentTitle}</span>
-      <i className="bi bi-three-dots-vertical h-6 w-6 text-gray-400 cursor-pointer" onClick={handleOpenModal}></i>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onDownload={onDownload}
-        onRename={onRename}
-        onDelete={onDelete}
-      />
+    <div className="bg-white shadow-md rounded-lg p-4 mb-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h4 className="font-bold text-lg">{documentTitle}</h4>
+          <p className="text-sm text-gray-500">Type: {documentType}</p>
+        </div>
+        <div className="flex space-x-2">
+          <button onClick={onEdit} className="text-blue-500">Edit</button>
+          <button onClick={onDownload} className="text-green-500">Download</button>
+          <button onClick={onRename} className="text-yellow-500">Rename</button>
+          <button onClick={onDelete} className="text-red-500">Delete</button>
+        </div>
+      </div>
     </div>
   );
 };
 
-DocumentCard.propTypes = {
-  documentType: PropTypes.oneOf(["doc", "pdf"]),
-  documentTitle: PropTypes.string,
-  onEdit: PropTypes.func,
-  onDownload: PropTypes.func,
-  onDelete: PropTypes.func,
-  onRename: PropTypes.func,
-};
-
 export default DocumentCard;
+
+
+
 
 
