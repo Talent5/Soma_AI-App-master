@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Metrics } from './Metrics';
 import { Applications } from './Applications';
@@ -8,7 +8,6 @@ import { doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
 export const Dashboard = () => {
   const [userName, setUserName] = useState('James'); // Default to "James"
   const [profilePicture, setProfilePicture] = useState(null); // State for profile picture
-  const fileInputRef = useRef(null); // Reference to the file input
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
@@ -22,7 +21,7 @@ export const Dashboard = () => {
             const userData = userDoc.data();
             setUserName(userData.firstName || 'James'); // Set the user's first name or default to "James"
             if (userData.profilePicture) {
-              setProfilePicture(userData.profilePicture); // Set the profile picture if available
+              setProfilePicture(userData.profilePicture); // Set the profile picture from Firestore
             }
           }
         }
@@ -34,24 +33,6 @@ export const Dashboard = () => {
     fetchUserData();
   }, []);
 
-  const handleProfilePicChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePicture(reader.result);
-        localStorage.setItem('profilePicture', reader.result); // Optionally store the profile picture locally
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleProfilePicClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   const handleProfileClick = () => {
     navigate('/profile'); // Navigate to the profile page
   };
@@ -60,9 +41,10 @@ export const Dashboard = () => {
     <div className="bg-white rounded-lg shadow-md p-8 mb-4 max-w-sm mx-auto">
       <div className="flex justify-between items-center pb-2">
         <div className="flex items-center">
+          {/* Clicking the profile picture now navigates to the profile page */}
           <div
             className="w-12 h-12 rounded-full cursor-pointer flex items-center justify-center overflow-hidden"
-            onClick={handleProfilePicClick}
+            onClick={handleProfileClick}
           >
             {profilePicture ? (
               <img
@@ -82,14 +64,6 @@ export const Dashboard = () => {
         </div>
         <i className="bi bi-bell text-2xl"></i>
       </div>
-
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleProfilePicChange}
-        className="hidden"
-        ref={fileInputRef}
-      />
 
       <div className="border border-gray-200 rounded-lg ps-3">
         <div className="p-4 ps-2 space-y-4">
@@ -114,6 +88,8 @@ export const Dashboard = () => {
     </div>
   );
 };
+
+
 
 
 

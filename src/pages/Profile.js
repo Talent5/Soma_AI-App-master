@@ -11,7 +11,7 @@ export const Profile = () => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-3">
       <div className=" top-4 left-4">
           <i onClick={handleBackClick} className= "bi bi-arrow-left text-xl p5-4 px-">Profile</i>
         
