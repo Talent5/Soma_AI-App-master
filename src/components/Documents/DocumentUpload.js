@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { addDoc, collection } from 'firebase/firestore';
 import { storage, db } from '../config/firebase';
 
-const DocumentUpload = ({ onClose }) => {
+const DocumentUpload = ({ onClose, onDocumentAdded }) => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -12,25 +15,27 @@ const DocumentUpload = ({ onClose }) => {
   const handleUpload = async () => {
     if (!file || !title) return;
 
-    const storageRef = storage.ref(`documents/${file.name}`);
-    const uploadTask = storageRef.put(file);
+    setUploading(true);
+    const storageRef = ref(storage, `documents/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
       'state_changed',
       null,
       (error) => {
         console.error('Upload error:', error);
+        setUploading(false);
       },
       async () => {
-        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-        await db.collection('documents').add({
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        await addDoc(collection(db, 'documents'), {
           title,
           url: downloadURL,
+          type: file.type,
           createdAt: new Date(),
         });
-        setFile(null);
-        setTitle('');
-        onClose(); // Close the modal
+        setUploading(false);
+        onDocumentAdded();
       }
     );
   };
@@ -60,8 +65,9 @@ const DocumentUpload = ({ onClose }) => {
         <button
           className="w-full bg-blue-500 text-white px-4 py-2 rounded-md"
           onClick={handleUpload}
+          disabled={uploading}
         >
-          Upload
+          {uploading ? 'Uploading...' : 'Upload'}
         </button>
       </div>
     </div>
