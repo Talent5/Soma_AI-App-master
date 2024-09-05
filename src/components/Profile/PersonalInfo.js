@@ -98,7 +98,7 @@ export const PersonalInformation = () => {
   return (
     <main>
       <div className=" top-4 left-4">
-          <i onClick={handleBackClick} className= "bi bi-arrow-left text-xl p5-4 px-">Profile</i>
+          <i onClick={handleBackClick} className= "bi bi-arrow-left text-xl p5-4 px-">Personal Information</i>
         
       </div>
         <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto">

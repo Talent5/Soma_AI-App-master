@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useCallback, useMemo } from 
 import { db } from '../config/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import axios from 'axios'; // Import axios for making HTTP requests
 
 export const FormDataContext = createContext();
 
@@ -26,8 +27,8 @@ const initialFormState = {
   highSchoolName: '',
   gpa: '',
   educationLevel: '',
-  cv: null, // CV is initially null
-  userId: localStorage.getItem('userId') || '', // Get userId from localStorage if available
+  cv: null,
+  userId: localStorage.getItem('userId') || '',
 };
 
 export const FormDataProvider = ({ children }) => {
@@ -39,7 +40,7 @@ export const FormDataProvider = ({ children }) => {
         return {
           ...initialFormState,
           ...parsedData,
-          userId: localStorage.getItem('userId') || parsedData.userId || '', // Ensure userId is set
+          userId: localStorage.getItem('userId') || parsedData.userId || '',
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
@@ -70,41 +71,35 @@ export const FormDataProvider = ({ children }) => {
     let cvDownloadURL = null;
 
     try {
-      // Ensure userId is available
       if (!formData.userId) {
         throw new Error('User ID is missing. Please try again.');
       }
 
-      // If there's a CV file, upload it to Firebase Storage
       if (formData.cv) {
-        const fileName = formData.cv.name || 'default_cv_name.pdf'; // Fallback to a default file name if `formData.cv.name` is undefined
+        const fileName = formData.cv.name || 'default_cv_name.pdf';
         const cvRef = ref(storage, `cvs/${formData.userId}_${fileName}`);
         await uploadBytes(cvRef, formData.cv);
-
-        // Get the download URL for the uploaded file
         cvDownloadURL = await getDownloadURL(cvRef);
       }
 
-      // Prepare data to store in Firestore, including the CV download URL if it exists
       const formDataToSave = {
         ...formData,
-        cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
+        cv: cvDownloadURL || '',
       };
 
-      // Remove any fields that are explicitly null or undefined
       Object.keys(formDataToSave).forEach(key => {
         if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
           delete formDataToSave[key];
         }
       });
 
-      // Save form data to Firestore
       const docRef = doc(db, 'users', formData.userId);
       await setDoc(docRef, formDataToSave, { merge: true });
 
-      console.log('Submission successful');
+      // Send form data to Node.js server
+      await axios.patch('https://somaai.onrender.com/api/user/update', formDataToSave);
+      console.log('User information sent to server');
 
-      // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
       setFormData(initialFormState);
 

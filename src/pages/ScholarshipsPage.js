@@ -14,7 +14,7 @@ export const ScholarshipsPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('https://soma-model.onrender.com/matched-scholarsip', {
+      const response = await fetch('https://somaai.onrender.com/api/user/:userid', {
         mode: 'cors', // Explicitly set CORS mode
       });
       if (!response.ok) {

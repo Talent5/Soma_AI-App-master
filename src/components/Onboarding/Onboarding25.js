@@ -23,7 +23,7 @@ export const Onboarding25 = () => {
         throw new Error(error || 'Failed to submit form data');
       }
       console.log('Form data submitted successfully');
-      navigate('/home');
+      navigate('/home'); // Navigate to home on successful submission
     } catch (err) {
       console.error('Error submitting form data:', err);
       setError(err.message || 'An unexpected error occurred');
@@ -42,7 +42,7 @@ export const Onboarding25 = () => {
 
   const handleConfirm = () => {
     setShowReview(false);
-    handleProfileUpdate();
+    handleProfileUpdate(); // Submit form data after confirmation
   };
 
   return (
@@ -62,7 +62,7 @@ export const Onboarding25 = () => {
           onEdit={handleEdit}
         />
       ) : (
-        <div className="">
+        <div>
           <button
             className="continue-button px-4"
             onClick={handleReview}
