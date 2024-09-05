@@ -13,7 +13,7 @@ export const DocumentPage = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'documents'), (snapshot) => {
@@ -73,6 +73,7 @@ export const DocumentPage = () => {
     </div>
   );
 };
+
 
 
 

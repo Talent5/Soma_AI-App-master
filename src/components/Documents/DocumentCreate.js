@@ -4,56 +4,66 @@ import { db } from '../config/firebase';
 
 const DocumentCreate = ({ onClose, onDocumentAdded }) => {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [description, setDescription] = useState('');
+  const [tags, setTags] = useState('');
 
   const handleCreate = async () => {
-    if (!title || !content) return;
-
+    if (!title) return alert('Title is required');
     try {
       await addDoc(collection(db, 'documents'), {
         title,
-        content,
-        type: 'text',
+        description,
+        tags: tags.split(',').map(tag => tag.trim()),
         createdAt: new Date(),
       });
-      onDocumentAdded();
+      onDocumentAdded(); // Close modal and refresh document list
     } catch (error) {
       console.error('Error creating document:', error);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-4 w-96 relative">
-        <button
-          className="absolute top-2 right-2 text-gray-600"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <i className="bi bi-x-lg h-6 w-6"></i>
-        </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 className="text-lg font-semibold mb-4">Create Document</h2>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Document Title"
-          className="w-full border border-gray-300 rounded-md px-2 py-1 mb-2"
+          placeholder="Title"
+          className="border p-2 w-full mb-4"
         />
         <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Document Content"
-          className="w-full border border-gray-300 rounded-md px-2 py-1 mb-2 h-40"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Description"
+          className="border p-2 w-full mb-4"
         />
-        <button
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md"
-          onClick={handleCreate}
-        >
-          Create Document
-        </button>
+        <input
+          type="text"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          placeholder="Tags (comma-separated)"
+          className="border p-2 w-full mb-4"
+        />
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={handleCreate}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Create
+          </button>
+          <button
+            onClick={onClose}
+            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default DocumentCreate;
+

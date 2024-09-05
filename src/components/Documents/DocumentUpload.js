@@ -1,77 +1,79 @@
 import React, { useState } from 'react';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection } from 'firebase/firestore';
-import { storage, db } from '../config/firebase';
+import { db } from '../config/firebase';
 
 const DocumentUpload = ({ onClose, onDocumentAdded }) => {
   const [file, setFile] = useState(null);
-  const [title, setTitle] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const storage = getStorage();
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
-    if (!file || !title) return;
-
+    if (!file) return alert('Please select a file first.');
+    
     setUploading(true);
+    
     const storageRef = ref(storage, `documents/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
-
+    
     uploadTask.on(
       'state_changed',
-      null,
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setProgress(progress);
+      },
       (error) => {
         console.error('Upload error:', error);
         setUploading(false);
       },
       async () => {
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        await addDoc(collection(db, 'documents'), {
-          title,
-          url: downloadURL,
-          type: file.type,
-          createdAt: new Date(),
-        });
+        try {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          await addDoc(collection(db, 'documents'), {
+            title: file.name,
+            url,
+            type: file.type,
+            createdAt: new Date(),
+          });
+          onDocumentAdded(); // Close modal and refresh document list
+        } catch (error) {
+          console.error('Error adding document:', error);
+        }
         setUploading(false);
-        onDocumentAdded();
       }
     );
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-4 w-64 relative">
-        <button
-          className="absolute top-2 right-2 text-gray-600"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <i className="bi bi-x-lg h-6 w-6"></i>
-        </button>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Document Title"
-          className="w-full border border-gray-300 rounded-md px-2 py-1 mb-2"
-        />
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="w-full mb-2"
-        />
-        <button
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md"
-          onClick={handleUpload}
-          disabled={uploading}
-        >
-          {uploading ? 'Uploading...' : 'Upload'}
-        </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+        <h2 className="text-lg font-semibold mb-4">Upload Document</h2>
+        <input type="file" onChange={handleFileChange} />
+        {uploading && <p>Uploading: {Math.round(progress)}%</p>}
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={handleUpload}
+            disabled={uploading}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            {uploading ? 'Uploading...' : 'Upload'}
+          </button>
+          <button
+            onClick={onClose}
+            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default DocumentUpload;
+
