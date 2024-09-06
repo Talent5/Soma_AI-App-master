@@ -13,6 +13,7 @@ export const Onboarding25 = () => {
   const [error, setError] = useState('');
   const [showReview, setShowReview] = useState(false);
 
+  // Handle form submission with loading state and error handling
   const handleProfileUpdate = useCallback(async () => {
     setIsSubmitting(true);
     setError('');
@@ -32,14 +33,17 @@ export const Onboarding25 = () => {
     }
   }, [navigate, submitFormData]);
 
+  // Show review screen before submission
   const handleReview = () => {
     setShowReview(true);
   };
 
+  // Edit review
   const handleEdit = () => {
     setShowReview(false);
   };
 
+  // Confirm and submit after reviewing
   const handleConfirm = () => {
     setShowReview(false);
     handleProfileUpdate(); // Submit form data after confirmation
@@ -55,6 +59,7 @@ export const Onboarding25 = () => {
       <p className="section-title">~ Welcome To SomaAi</p>
       <h2>Review Your Information</h2>
       {error && <p className="error-message">{error}</p>}
+      
       {showReview ? (
         <ReviewScreen
           formData={formData}
@@ -68,7 +73,14 @@ export const Onboarding25 = () => {
             onClick={handleReview}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Review and Set Up Profile'}
+            {isSubmitting ? (
+              <div className="spinner-container">
+                <div className="loading-spinner"></div>
+                Submitting...
+              </div>
+            ) : (
+              'Review and Set Up Profile'
+            )}
           </button>
           <button
             className="later-button"
@@ -81,6 +93,7 @@ export const Onboarding25 = () => {
     </div>
   );
 };
+
 
 
 
