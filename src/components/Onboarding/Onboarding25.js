@@ -67,28 +67,28 @@ export const Onboarding25 = () => {
           onEdit={handleEdit}
         />
       ) : (
-        <div>
-          <button
-            className="continue-button px-4"
-            onClick={handleReview}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <div className="spinner-container">
-                <div className="loading-spinner"></div>
-                Submitting...
-              </div>
-            ) : (
-              'Review and Set Up Profile'
-            )}
-          </button>
-          <button
-            className="later-button"
-            onClick={() => navigate('/home')}
-          >
-            I will do this later
-          </button>
-        </div>
+      <div className='w-600'>
+        <button
+          className="continue-button px-4"
+          onClick={handleReview}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <div className="spinner-container">
+              <div className="loading-spinner"></div>
+              Submitting...
+            </div>
+          ) : (
+            'Review and Set Up Profile'
+          )}
+        </button>
+        <button
+          className="later-button"
+          onClick={() => navigate('/home')}
+        >
+          I will do this later
+        </button>
+      </div>
       )}
     </div>
   );
