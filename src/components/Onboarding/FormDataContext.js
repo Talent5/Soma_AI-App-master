@@ -28,6 +28,7 @@ const initialFormState = {
   educationLevel: '',
   cv: null, // CV is initially null
   userId: localStorage.getItem('userId') || '', // Get userId from localStorage if available
+  graduationDate: '', // Added this field for graduation date
 };
 
 export const FormDataProvider = ({ children }) => {
@@ -85,6 +86,39 @@ export const FormDataProvider = ({ children }) => {
         cvDownloadURL = await getDownloadURL(cvRef);
       }
 
+      // Prepare data for backend API, mapping fields to expected names
+      const backendData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        middleName: formData.middleName || '', // If no middle name provided, set it to an empty string
+        phoneNo: formData.phoneNumber || '',
+        nationality: formData.countryName || '',
+        level_of_education: formData.educationLevel || '',
+        university: formData.universityName || '',
+        high_school: formData.highSchoolName || '',
+        course: formData.intendedFieldOfStudy || '',
+        GPA: formData.gpa || '',
+        graduation_date: formData.graduationDate || '', // Assuming you have a field for graduation date
+        date_of_birth: formData.dateOfBirth || '',
+        location: formData.countryName || '', // Assuming location is the same as country
+        degree: formData.degreeType || '',
+        funds_needed: formData.financialNeed || '',
+        uploadedCV: cvDownloadURL || '', // URL of the uploaded CV
+      };
+
+      // Send form data to the Node.js backend API
+      const response = await fetch('https://somaai.onrender.com/api/user/ai-model', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(backendData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send data to backend API');
+      }
+
       // Prepare data to store in Firestore, including the CV download URL if it exists
       const formDataToSave = {
         ...formData,
@@ -93,7 +127,7 @@ export const FormDataProvider = ({ children }) => {
 
       // Remove any fields that are explicitly null or undefined
       Object.keys(formDataToSave).forEach(key => {
-        if (formDataToSave[key] === null || undefined) {
+        if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
           delete formDataToSave[key];
         }
       });
@@ -101,19 +135,6 @@ export const FormDataProvider = ({ children }) => {
       // Save form data to Firestore
       const docRef = doc(db, 'users', formData.userId);
       await setDoc(docRef, formDataToSave, { merge: true });
-
-      // **Send form data to the provided Node.js backend API**
-      const response = await fetch('https://somaai.onrender.com/api/user/ai-model', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formDataToSave),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send data to backend API');
-      }
 
       console.log('Submission successful to both Firestore and backend');
 
