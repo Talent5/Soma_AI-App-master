@@ -104,7 +104,7 @@ export const FormDataProvider = ({ children }) => {
 
       // **Send form data to the provided Node.js backend API**
       const response = await fetch('https://somaai.onrender.com/api/user/ai-model', {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
