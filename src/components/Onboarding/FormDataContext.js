@@ -26,9 +26,9 @@ const initialFormState = {
   highSchoolName: '',
   gpa: '',
   educationLevel: '',
-  cv: null, // CV is initially null
-  userId: localStorage.getItem('userId') || '', // Get userId from localStorage if available
-  graduationDate: '', // Added this field for graduation date
+  cv: null,
+  userId: localStorage.getItem('userId') || '',
+  graduationDate: '',
 };
 
 export const FormDataProvider = ({ children }) => {
@@ -40,7 +40,7 @@ export const FormDataProvider = ({ children }) => {
         return {
           ...initialFormState,
           ...parsedData,
-          userId: localStorage.getItem('userId') || parsedData.userId || '', // Ensure userId is set
+          userId: localStorage.getItem('userId') || parsedData.userId || '',
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
@@ -78,7 +78,7 @@ export const FormDataProvider = ({ children }) => {
 
       // If there's a CV file, upload it to Firebase Storage
       if (formData.cv) {
-        const fileName = formData.cv.name || 'default_cv_name.pdf'; // Fallback to a default file name if `formData.cv.name` is undefined
+        const fileName = formData.cv.name || 'default_cv_name.pdf';
         const cvRef = ref(storage, `cvs/${formData.userId}_${fileName}`);
         await uploadBytes(cvRef, formData.cv);
 
@@ -86,11 +86,11 @@ export const FormDataProvider = ({ children }) => {
         cvDownloadURL = await getDownloadURL(cvRef);
       }
 
-      // Prepare data for backend API, mapping fields to expected names
+      // Prepare data for backend API
       const backendData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        middleName: formData.middleName || '', // If no middle name provided, set it to an empty string
+        middleName: formData.middleName || '',
         phoneNo: formData.phoneNumber || '',
         nationality: formData.countryName || '',
         level_of_education: formData.educationLevel || '',
@@ -98,12 +98,12 @@ export const FormDataProvider = ({ children }) => {
         high_school: formData.highSchoolName || '',
         course: formData.intendedFieldOfStudy || '',
         GPA: formData.gpa || '',
-        graduation_date: formData.graduationDate || '', // Assuming you have a field for graduation date
+        graduation_date: formData.graduationDate || '',
         date_of_birth: formData.dateOfBirth || '',
-        location: formData.countryName || '', // Assuming location is the same as country
+        location: formData.countryName || '',
         degree: formData.degreeType || '',
         funds_needed: formData.financialNeed || '',
-        uploadedCV: cvDownloadURL || '', // URL of the uploaded CV
+        uploadedCV: cvDownloadURL || '',
       };
 
       // Send form data to the Node.js backend API
@@ -119,24 +119,50 @@ export const FormDataProvider = ({ children }) => {
         throw new Error('Failed to send data to backend API');
       }
 
-      // Prepare data to store in Firestore, including the CV download URL if it exists
-      const formDataToSave = {
-        ...formData,
-        cv: cvDownloadURL || '', // Save the download URL, or an empty string if no CV was uploaded
+      const signUpData = await response.json(); // Assuming API returns JSON data including userId
+
+      // Fetch the model data from the user endpoint using the returned userId
+      const userId = signUpData.userId;
+      const modelResponse = await fetch(`https://somaai.onrender.com/api/user/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!modelResponse.ok) {
+        throw new Error('Failed to fetch user model data from backend');
+      }
+
+      const scholarshipData = await modelResponse.json();
+
+      // Now save the responseData (scholarship data) to Firestore
+      const scholarshipDetails = {
+        title: scholarshipData.Title || '',
+        link: scholarshipData.Link || '',
+        location: scholarshipData.Location || '',
+        description: scholarshipData.Description || '',
+        funds: scholarshipData.Funds || '',
+        date_degree: scholarshipData.date_degree || '',
+        match_score: scholarshipData.match_score || '',
       };
 
-      // Remove any fields that are explicitly null or undefined
+      const formDataToSave = {
+        ...formData,
+        cv: cvDownloadURL || '',
+        scholarshipDetails, // Store the scholarship data in Firestore under the user's document
+      };
+
       Object.keys(formDataToSave).forEach(key => {
         if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
           delete formDataToSave[key];
         }
       });
 
-      // Save form data to Firestore
       const docRef = doc(db, 'users', formData.userId);
       await setDoc(docRef, formDataToSave, { merge: true });
 
-      console.log('Submission successful to both Firestore and backend');
+      console.log('Submission and model data fetch successful, saved to Firestore');
 
       // Clear local storage and reset form data after successful submission
       localStorage.removeItem('formData');
@@ -167,3 +193,4 @@ export const FormDataProvider = ({ children }) => {
     </FormDataContext.Provider>
   );
 };
+
