@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
@@ -17,8 +18,11 @@ export const Onboarding1 = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+
+      // Store user email and user ID in local storage
       localStorage.setItem('userEmail', user.email);
       localStorage.setItem('userId', user.uid);
+
       navigate('/onboarding2');
     } catch (err) {
       console.error('Error during Firebase authentication:', err);
@@ -40,10 +44,10 @@ export const Onboarding1 = () => {
   }
 
   return (
-    <section className="text-center mt-8 ">
+    <section className="text-center mt-8">
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <button
-        className="bg-[#1E1548] text-white rounded-full  p-4 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95"
+        className="bg-[#1E1548] text-white rounded-full w-full px-16 py-2 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95"
         onClick={handleGoogleAuth}
         aria-label="Sign up with Google"
       >
@@ -52,7 +56,7 @@ export const Onboarding1 = () => {
       </button>
       <p className="text-gray-500 mb-4">Already have an account?</p>
       <button
-        className="text-[#1E1548] rounded-full p-4 flex items-center justify-center border border-blue-800 transition-transform transform hover:bg-[#e0e0e0] active:bg-[#d0d0d0] active:scale-95"
+        className="text-[#1E1548] rounded-full px-16 py-3 flex items-center justify-center border border-blue-800 transition-transform transform hover:bg-[#e0e0e0] active:bg-[#d0d0d0] active:scale-95"
         onClick={handleGoogleAuth}
         aria-label="Log in with Google"
       >
