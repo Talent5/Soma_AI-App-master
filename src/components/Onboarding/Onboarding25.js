@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
