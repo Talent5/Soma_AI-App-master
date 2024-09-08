@@ -25,7 +25,7 @@ export const Onboarding5 = () => {
   };
 
   return (
-    <div className="onboarding-screen">
+    <div className="onboarding-screen p-4">
       <BackButton />
       <Header />
       <p className="section-title">~ Personal information</p>

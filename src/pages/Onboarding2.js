@@ -69,7 +69,7 @@ export const Onboarding2 = () => {
               ? `Account successfully created. To get your profile fully set up, you'll need to provide the following details:`
               : `Welcome back, ${userEmail}! Let's update your profile information:`}
           </h1>
-          <ul className="list-disc list-inside mb-6 text-gray-700">
+          <ul className="list-disc list-inside mb-6 text-gray-800">
             <li>Personal information</li>
             <li>Educational background</li>
             <li>Field of study</li>

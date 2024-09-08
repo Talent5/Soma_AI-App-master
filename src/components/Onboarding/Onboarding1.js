@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
@@ -32,37 +31,40 @@ export const Onboarding1 = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="text-center mt-8">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <p>Authenticating...</p>
-      </div>
-    );
-  }
-
   return (
-    <section className="text-center mt-8">
+    <section className="text-center mt-4">
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <button
-        className="bg-[#1E1548] text-white rounded-full w-full px-16 py-2 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95"
-        onClick={handleGoogleAuth}
-        aria-label="Sign up with Google"
-      >
-        <img src={IconImage} alt="Google Icon" className="mr-2" />
-        Sign up with Google
-      </button>
-      <p className="text-gray-500 mb-4">Already have an account?</p>
-      <button
-        className="text-[#1E1548] rounded-full px-16 py-3 flex items-center justify-center border border-blue-800 transition-transform transform hover:bg-[#e0e0e0] active:bg-[#d0d0d0] active:scale-95"
-        onClick={handleGoogleAuth}
-        aria-label="Log in with Google"
-      >
-        <img src={IconImage} alt="Google Icon" className="mr-2" />
-        Log in with Google
-      </button>
+      
+      {isLoading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p>Authenticating...</p>
+        </div>
+      ) : (
+        <>
+          <button
+            className="bg-[#1E1548] text-white rounded-full w-full px-2 py-3 flex items-center justify-center mb-4 transition-transform transform hover:bg-[#3a2d78] active:bg-[#1a1038] active:scale-95"
+            onClick={handleGoogleAuth}
+            aria-label="Sign up with Google"
+          >
+            <img src={IconImage} alt="Google Icon" className="mr-2" />
+            Sign up with Google
+          </button>
+          
+          <p className="text-gray-500 mb-4 px-6">Already have an account, then</p>
+          
+          <button
+            className="text-[#1E1548] border border-[#1E1548] rounded-full px-4 py-3 flex items-center justify-center transition-transform transform hover:bg-[#f0f0f0] active:bg-[#e0e0e0] active:scale-95"
+            onClick={handleGoogleAuth}
+            aria-label="Log in with Google"
+          >
+            <img src={IconImage} alt="Google Icon" className="mr-2" />
+            Log in with Google
+          </button>
+        </>
+      )}
     </section>
   );
 };

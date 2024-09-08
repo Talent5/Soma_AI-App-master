@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/App.js
 import React, { useState, useEffect } from 'react';
 import {
@@ -150,7 +151,6 @@ function App() {
               {shouldShowNavbar && <NavBar location={location} />}
               <Routes>
                 <Route path="/" element={<Content />} />
-                <Route path="/onboarding1" element={<Onboarding1 />} />
                 <Route path="/onboarding2" element={<Onboarding2 />} />
                 <Route path="/onboarding3" element={<Onboarding3 />} />
                 <Route path="/onboarding4" element={<Onboarding4 />} />

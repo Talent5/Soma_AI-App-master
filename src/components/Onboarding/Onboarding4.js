@@ -29,7 +29,7 @@ export const Onboarding4 = () => {
   };
 
   return (
-    <div className="onboarding-screen">
+    <div className="onboarding-screen p-4">
       <BackButton />
       <Header />
       <div className="progress-bar">

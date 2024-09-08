@@ -1,9 +1,9 @@
 import React from 'react';
 import Header from '../components/Welcome/Header';
 import WelcomeCard from '../components/Welcome/WelcomeCard';
-import {Onboarding1} from '../components/Onboarding/Onboarding1';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS
-import 'bootstrap-icons/font/bootstrap-icons.css'; // Bootstrap Icons
+import { Onboarding1 } from '../components/Onboarding/Onboarding1';
+import 'bootstrap/dist/css/bootstrap.min.css'; 
+import 'bootstrap-icons/font/bootstrap-icons.css'; 
 
 export const Content = () => {
   return (
@@ -14,5 +14,6 @@ export const Content = () => {
     </div>
   );
 };
+
 
 

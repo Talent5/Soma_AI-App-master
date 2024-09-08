@@ -20,7 +20,7 @@ export const Onboarding20 = () => {
   };
 
   return (
-    <div className="onboarding-screen">
+    <div className="onboarding-screen p-4">
       <BackButton />
       <Header />
 

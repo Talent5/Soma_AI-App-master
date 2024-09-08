@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Onboarding.css';
 import { FormDataContext } from './FormDataContext';
@@ -8,38 +8,57 @@ import Header from './Header';
 export const Onboarding6 = () => {
   const navigate = useNavigate();
   const { formData, updateFormData } = useContext(FormDataContext);
+  const [dateOfBirth, setDateOfBirth] = useState(formData.dateOfBirth || '');
+
+  const memoizedUpdateFormData = useCallback(
+    (data) => {
+      updateFormData(data);
+    },
+    [updateFormData]
+  );
 
   useEffect(() => {
-    // Only update formData if currentStep is not already 6
-    if (formData.currentStep !== 6) {
-      updateFormData({ currentStep: 6 });
+    // Load form data from localStorage on mount
+    const storedFormData = localStorage.getItem('formData');
+    if (storedFormData) {
+      memoizedUpdateFormData(JSON.parse(storedFormData));
     }
-  }, [formData.currentStep, updateFormData]); // Ensure useEffect only runs when currentStep changes
+  }, [memoizedUpdateFormData]);
+
+  useEffect(() => {
+    // Save form data to localStorage whenever formData or dateOfBirth changes
+    localStorage.setItem('formData', JSON.stringify({ ...formData, dateOfBirth }));
+  }, [formData, dateOfBirth]);
 
   const handleInputChange = (e) => {
-    updateFormData({ dateOfBirth: e.target.value });
+    setDateOfBirth(e.target.value);
   };
 
   const handleContinue = () => {
-    if (formData.dateOfBirth) {
-      navigate('/onboarding7');
-    } else {
-      alert('Please enter your date of birth before continuing.');
-    }
+    memoizedUpdateFormData({ ...formData, dateOfBirth });
+    navigate('/onboarding7'); // Ensure this route is configured correctly
   };
 
   return (
-    <div className="onboarding-screen">
+    <div className="onboarding-screen p-4">
       <BackButton />
       <Header />
-      <p className="section-title">~ Personal information</p>
-      <h2>Your date of birth?</h2>
+
+      {/* Progress bar */}
+      <div className="progress-bar">
+        <div className="progress" style={{ width: '40%' }}></div> {/* Adjust width as needed */}
+      </div>
+
+      <p className="section-title">~ Personal Information</p>
+      <h2>When is your date of birth?</h2>
+
       <input
         type="date"
         className="input-field"
-        value={formData.dateOfBirth || ''}
+        value={dateOfBirth}
         onChange={handleInputChange}
       />
+
       <button className="continue-button" onClick={handleContinue}>
         Continue
       </button>
@@ -49,4 +68,3 @@ export const Onboarding6 = () => {
     </div>
   );
 };
-

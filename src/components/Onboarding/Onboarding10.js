@@ -44,7 +44,7 @@ export const Onboarding10 = () => {
   };
 
   return (
-    <div className="onboarding-screen">
+    <div className="onboarding-screen p-4">
       <BackButton />
       <Header />
 
