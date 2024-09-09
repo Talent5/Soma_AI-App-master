@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs'; // Three dots icon
 import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi'; // Icons for actions
-import { db } from '../config/firebase'; // Make sure to export your Firestore instance from this file
+import { getFirestore, doc, updateDoc, deleteDoc } from 'firebase/firestore'; // Import Firestore methods
+import { getAuth } from 'firebase/auth'; // Import Auth methods
+import './DocumentCard.css'
 
 const DocumentCard = ({ document }) => {
   const [menuVisible, setMenuVisible] = useState(false); // Toggle visibility of menu
   const [newTitle, setNewTitle] = useState(document.title || document.name);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Toggle visibility of modal
+  const db = getFirestore();
+  const auth = getAuth();
 
   const handleDownload = () => {
     if (document.url) {
-      window.open(document.url, '_blank')
+      window.open(document.url, '_blank');
     } else {
       alert('Document URL not available.');
     }
@@ -19,7 +24,8 @@ const DocumentCard = ({ document }) => {
     const newTitle = prompt("Enter new title:", document.title || document.name);
     if (newTitle) {
       try {
-        await db.collection('documents').doc(document.id).update({ title: newTitle });
+        const docRef = doc(db, `users/${auth.currentUser.uid}/documents/${document.id}`);
+        await updateDoc(docRef, { title: newTitle });
         alert('Document renamed successfully.');
         setNewTitle(newTitle);
       } catch (error) {
@@ -30,15 +36,24 @@ const DocumentCard = ({ document }) => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm(`Are you sure you want to delete "${document.title || document.name}"?`)) {
-      try {
-        await db.collection('documents').doc(document.id).delete();
-        alert('Document deleted successfully.');
-      } catch (error) {
-        console.error('Error deleting document: ', error);
-        alert('Failed to delete document.');
-      }
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const docRef = doc(db, `users/${auth.currentUser.uid}/documents/${document.id}`);
+      await deleteDoc(docRef);
+      alert('Document deleted successfully.');
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error('Error deleting document: ', error);
+      alert('Failed to delete document.');
+      setIsModalOpen(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -71,6 +86,22 @@ const DocumentCard = ({ document }) => {
           </div>
           <div onClick={handleDelete} className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer text-red-500">
             <FiTrash2 /> <span>Delete</span>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <div className="modal-header">Confirm Deletion</div>
+            <div className="modal-body">
+              <p>Are you sure you want to delete the document titled "{document.title || document.name}"?</p>
+            </div>
+            <div className="modal-footer">
+              <button className="modal-button modal-confirm" onClick={confirmDelete}>Confirm</button>
+              <button className="modal-button modal-cancel" onClick={cancelDelete}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
