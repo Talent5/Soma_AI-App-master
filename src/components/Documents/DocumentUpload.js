@@ -11,6 +11,8 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const storage = getStorage();
 
+  const userId = localStorage.getItem('userId'); // Retrieve userId from localStorage
+
   const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
   const ALLOWED_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
@@ -40,8 +42,13 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
       return;
     }
 
+    if (!userId) {
+      setError('User not logged in. Please log in first.');
+      return;
+    }
+
     setUploading(true);
-    const storageRef = ref(storage, `documents/${file.name}`);
+    const storageRef = ref(storage, `documents/${userId}/${file.name}`); // Use the userId from localStorage
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
@@ -63,9 +70,15 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
             url,
             type: file.type,
             createdAt: new Date(),
+            userId: userId, // Save the user ID in the document entry
           });
+
           setSuccessMessage('Document uploaded successfully!');
-          onDocumentAdded(); // Trigger the parent callback
+          setTimeout(() => {
+            onDocumentAdded(); // Trigger the parent callback
+            onClose(); // Close the modal automatically after upload
+          }, 1500); // Close after a short delay to show the success message
+
           setFile(null);
           setProgress(0);
         } catch (error) {
@@ -124,5 +137,6 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
 };
 
 export default DocumentUpload;
+
 
 

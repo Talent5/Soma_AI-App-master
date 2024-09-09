@@ -1,26 +1,44 @@
 import React, { useState } from 'react';
 import { BsThreeDotsVertical } from 'react-icons/bs'; // Three dots icon
 import { FiDownload, FiEdit, FiTrash2 } from 'react-icons/fi'; // Icons for actions
+import { db } from '../config/firebase'; // Make sure to export your Firestore instance from this file
 
 const DocumentCard = ({ document }) => {
   const [menuVisible, setMenuVisible] = useState(false); // Toggle visibility of menu
+  const [newTitle, setNewTitle] = useState(document.title || document.name);
 
   const handleDownload = () => {
     if (document.url) {
-      window.open(document.url, '_blank');
+      window.open(document.url, '_blank')
     } else {
       alert('Document URL not available.');
     }
   };
 
-  const handleRename = () => {
-    // Implement the rename functionality here
-    alert(`Rename document: ${document.title}`);
+  const handleRename = async () => {
+    const newTitle = prompt("Enter new title:", document.title || document.name);
+    if (newTitle) {
+      try {
+        await db.collection('documents').doc(document.id).update({ title: newTitle });
+        alert('Document renamed successfully.');
+        setNewTitle(newTitle);
+      } catch (error) {
+        console.error('Error renaming document: ', error);
+        alert('Failed to rename document.');
+      }
+    }
   };
 
-  const handleDelete = () => {
-    // Implement the delete functionality here
-    alert(`Delete document: ${document.title}`);
+  const handleDelete = async () => {
+    if (window.confirm(`Are you sure you want to delete "${document.title || document.name}"?`)) {
+      try {
+        await db.collection('documents').doc(document.id).delete();
+        alert('Document deleted successfully.');
+      } catch (error) {
+        console.error('Error deleting document: ', error);
+        alert('Failed to delete document.');
+      }
+    }
   };
 
   return (
@@ -33,7 +51,7 @@ const DocumentCard = ({ document }) => {
           </div>
           {/* Document Title */}
           <div>
-            <h3 className="font-semibold text-base">{document.title || document.name}</h3>
+            <h3 className="font-semibold text-base">{newTitle}</h3>
           </div>
         </div>
         {/* Three Dots Menu */}
@@ -61,6 +79,7 @@ const DocumentCard = ({ document }) => {
 };
 
 export default DocumentCard;
+
 
 
 
