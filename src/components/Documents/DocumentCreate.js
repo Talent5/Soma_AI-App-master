@@ -46,8 +46,7 @@ const DocumentCreate = ({ documentId, onClose }) => {
   const handleSave = useCallback(async (autoSave = false) => {
     if (!documentTitle.trim() && !documentContent.trim()) {
       if (!autoSave) {
-        navigate('/documents'); // Navigate to the documents page if no title and content
-        return; // Don't save
+        return; // Don't save if there is no title and content
       }
       return; // Do nothing if auto-save
     }
@@ -71,7 +70,6 @@ const DocumentCreate = ({ documentId, onClose }) => {
 
       if (!autoSave) {
         alert('Document saved successfully.');
-        navigate('/documents'); // Navigate to the documents page after saving
       }
     } catch (error) {
       console.error('Error saving document:', error);
@@ -81,7 +79,7 @@ const DocumentCreate = ({ documentId, onClose }) => {
     } finally {
       setIsSaving(false);
     }
-  }, [documentTitle, documentContent, documentId, navigate]);
+  }, [documentTitle, documentContent, documentId]);
 
   const debouncedAutoSave = useCallback(() => {
     if (autoSaveTimeoutRef.current) {
@@ -117,11 +115,10 @@ const DocumentCreate = ({ documentId, onClose }) => {
   };
 
   const handleBackButtonClick = () => {
-    if (!documentTitle.trim() && !documentContent.trim()) {
-      navigate('/documents'); // Navigate to the documents page without saving
-    } else {
-      handleSave(false); // Save the document if there is content
+    if (documentContent.trim() || documentTitle.trim()) {
+      handleSave(false); // Save the document if there is content or a title
     }
+    navigate('/documents'); // Always navigate to the documents page
   };
 
   return (
@@ -163,5 +160,6 @@ DocumentCreate.propTypes = {
 };
 
 export default DocumentCreate;
+
 
 
