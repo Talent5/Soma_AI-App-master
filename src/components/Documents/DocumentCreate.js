@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { setDoc, doc, getDoc } from 'firebase/firestore';
 import PropTypes from 'prop-types';
@@ -43,11 +44,19 @@ const DocumentCreate = ({ documentId, onClose }) => {
   }, [documentId]);
 
   const handleSave = useCallback(async (autoSave = false) => {
+    if (!documentTitle.trim() && !documentContent.trim()) {
+      if (!autoSave) {
+        navigate('/documents'); // Navigate to the documents page if no title and content
+        return; // Don't save
+      }
+      return; // Do nothing if auto-save
+    }
+
     if (!documentTitle.trim() || !documentContent.trim()) {
       if (!autoSave) {
         alert('Please provide a title and content for the document.');
       }
-      return;
+      return; // Don't save if title or content is missing
     }
 
     setIsSaving(true);
@@ -101,10 +110,24 @@ const DocumentCreate = ({ documentId, onClose }) => {
     }
   }, [documentContent]);
 
+  const handleFocusEditor = () => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+  };
+
+  const handleBackButtonClick = () => {
+    if (!documentTitle.trim() && !documentContent.trim()) {
+      navigate('/documents'); // Navigate to the documents page without saving
+    } else {
+      handleSave(false); // Save the document if there is content
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-white flex flex-col">
       <div className="flex items-center p-4 border-b">
-        <button onClick={onClose} className="mr-4 text-2xl text-gray-600 hover:text-gray-800">
+        <button onClick={handleBackButtonClick} className="mr-4 text-2xl text-gray-600 hover:text-gray-800">
           ←
         </button>
         <input
@@ -125,8 +148,7 @@ const DocumentCreate = ({ documentId, onClose }) => {
       />
 
       <button
-        onClick={() => handleSave(false)}
-        disabled={isSaving}
+        onClick={handleFocusEditor}
         className="fixed bottom-4 right-4 bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl shadow-lg hover:bg-indigo-700 transition-colors"
       >
         ✏️
