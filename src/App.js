@@ -137,6 +137,9 @@ function App() {
     '/onboarding25',
     '/onboarding26',
     '/onboarding27',
+    '/create',
+    '/profile',
+    '/personal-information',
     '/',
   ].includes(location.pathname);
 
