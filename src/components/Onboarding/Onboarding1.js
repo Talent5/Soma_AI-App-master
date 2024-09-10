@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, googleProvider } from '../config/firebase';
 import { signInWithPopup } from 'firebase/auth';
@@ -10,6 +10,16 @@ export const Onboarding1 = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const userEmail = localStorage.getItem('userEmail');
+    const userId = localStorage.getItem('userId');
+
+    if (userEmail && userId) {
+      // User is already signed in, navigate to the home page
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const handleGoogleAuth = async () => {
     setError(null);
@@ -68,7 +78,6 @@ export const Onboarding1 = () => {
     </section>
   );
 };
-
 
 
 

@@ -1,3 +1,4 @@
+// src/pages/DocumentPage.js
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../components/config/firebase';
@@ -13,13 +14,13 @@ export const DocumentPage = () => {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with true for loading state
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, 'documents'), (snapshot) => {
       const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setDocuments(docs);
-      setLoading(false);
+      setLoading(false); // Set loading to false once data is fetched
     });
 
     return () => unsubscribe();
@@ -41,6 +42,9 @@ export const DocumentPage = () => {
     setIsUploadOpen(false);
     setIsCreateOpen(false);
   };
+
+  const closeUploadModal = () => setIsUploadOpen(false);
+  const closeCreateModal = () => setIsCreateOpen(false);
 
   return (
     <div className="flex flex-col h-screen">
@@ -64,11 +68,17 @@ export const DocumentPage = () => {
       <NavBar />
 
       {isUploadOpen && (
-        <DocumentUpload onClose={() => setIsUploadOpen(false)} onDocumentAdded={handleDocumentAdded} />
+        <DocumentUpload
+          onClose={closeUploadModal} // Ensure this is a function
+          onDocumentAdded={handleDocumentAdded}
+        />
       )}
 
       {isCreateOpen && (
-        <DocumentCreate onClose={() => setIsCreateOpen(false)} onDocumentAdded={handleDocumentAdded} />
+        <DocumentCreate
+          onClose={closeCreateModal} // Ensure this is a function
+          onDocumentAdded={handleDocumentAdded}
+        />
       )}
     </div>
   );

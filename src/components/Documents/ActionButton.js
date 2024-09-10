@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import DocumentUpload from './DocumentUpload';
 import DocumentCreate from './DocumentCreate';
 
@@ -6,6 +7,8 @@ const ActionButton = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  const navigate = useNavigate(); // Initialize navigate
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   const closeDropdown = () => setIsDropdownOpen(false);
@@ -16,7 +19,7 @@ const ActionButton = () => {
   };
 
   const handleCreateClick = () => {
-    setIsCreateModalOpen(true);
+    navigate('/create'); // Redirect to /create
     closeDropdown();
   };
 
@@ -70,6 +73,7 @@ const ActionButton = () => {
 };
 
 export default ActionButton;
+
 
 
 

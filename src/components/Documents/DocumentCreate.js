@@ -1,125 +1,143 @@
-import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { addDoc, collection } from 'firebase/firestore';
+import React, { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, Bold, Italic, Underline, Link, List, GripVertical } from 'lucide-react';
+import { setDoc, doc } from 'firebase/firestore';
+import PropTypes from 'prop-types';
 import { db } from '../config/firebase';
 
-const DocumentCreate = ({ onClose }) => {
-  const [documentTitle, setDocumentTitle] = useState('');
+const AUTO_SAVE_INTERVAL = 10000; // Auto-save interval in milliseconds
+
+const DocumentCreate = ({ documentId, onClose }) => {
+  const [documentTitle, setDocumentTitle] = useState('Untitled Document');
   const [documentContent, setDocumentContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [useAI, setUseAI] = useState(false); // Toggle AI mode
-  const [aiPrompt, setAiPrompt] = useState(''); // Store user prompt for AI
+  const editorRef = useRef(null);
+  const isMounted = useRef(true);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    // Auto-save the document every AUTO_SAVE_INTERVAL milliseconds
+    const autoSaveInterval = setInterval(() => {
+      if (documentId) {
+        handleSave(true); // Auto-save without showing alerts
+      }
+    }, AUTO_SAVE_INTERVAL);
+
+    return () => {
+      isMounted.current = false;
+      clearInterval(autoSaveInterval);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentId]);
+
+  const handleSave = async (autoSave = false) => {
     if (!documentTitle || !documentContent) {
       return alert('Please provide a title and content for the document.');
     }
 
     setIsSaving(true);
     try {
-      await addDoc(collection(db, 'documents'), {
+      const documentRef = doc(db, 'documents', documentId || new Date().toISOString());
+      await setDoc(documentRef, {
         title: documentTitle,
         content: documentContent,
-        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: localStorage.getItem('userId'), // Store user ID
       });
-      alert('Document saved successfully.');
-      onClose();
+
+      if (!autoSave) {
+        alert('Document saved successfully.');
+      }
     } catch (error) {
       console.error('Error saving document:', error);
       alert('Failed to save the document.');
+    } finally {
+      setIsSaving(false);
     }
-    setIsSaving(false);
   };
 
-  // Function to generate AI content
-  const handleAIContent = async () => {
-    if (!aiPrompt) return alert('Please enter a prompt for AI assistance.');
+  const applyFormat = (command) => {
+    if (document.execCommand) {
+      document.execCommand(command, false, null);
+      if (editorRef.current) {
+        editorRef.current.focus();
+      }
+    }
+  };
 
-    // Placeholder: Here you can call the AI service (OpenAI, etc.)
-    const aiResponse = `This is a generated document based on the prompt: ${aiPrompt}. Customize this for your scholarship needs.`;
+  // Handle content updates
+  const handleInput = (e) => {
+    setDocumentContent(e.currentTarget.innerHTML);
+  };
 
-    setDocumentContent(documentContent + '\n' + aiResponse); // Append AI response
+  // Save on close if there are changes
+  const handleOnClose = () => {
+    if (documentTitle || documentContent) {
+      handleSave();
+    }
+    if (typeof onClose === 'function') {
+      onClose();
+    } else {
+      console.error('onClose prop is not a function');
+    }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl">
-        <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Document Title"
-            className="border border-gray-300 p-2 w-full rounded-lg"
-            value={documentTitle}
-            onChange={(e) => setDocumentTitle(e.target.value)}
-          />
-        </div>
+    <div className="flex flex-col h-screen bg-white text-gray-800">
+      {/* Header */}
+      <div className="flex items-center p-4 border-b bg-gray-100">
+        <button onClick={handleOnClose} className="mr-4">
+          <ArrowLeft size={24} />
+        </button>
+        <input
+          type="text"
+          value={documentTitle}
+          onChange={(e) => setDocumentTitle(e.target.value)}
+          className="flex-grow text-lg font-semibold outline-none border-none bg-gray-100"
+          placeholder="Document Title"
+        />
+      </div>
 
-        <div className="flex mb-4">
-          <button
-            onClick={() => setUseAI(!useAI)}
-            className={`px-4 py-2 rounded-lg mr-4 ${useAI ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}
-          >
-            {useAI ? 'AI Assistance Enabled' : 'Use AI Assistance'}
-          </button>
-          {!useAI && (
-            <p className="text-sm text-gray-600">
-              Type manually, or enable AI to assist with creating scholarship documents.
-            </p>
-          )}
-        </div>
+      {/* Document content */}
+      <div
+        ref={editorRef}
+        contentEditable
+        className="flex-grow p-4 text-base outline-none overflow-auto"
+        onInput={handleInput}
+        dangerouslySetInnerHTML={{ __html: documentContent }}
+      />
 
-        {useAI ? (
-          <>
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Enter your prompt (e.g., 'Cover letter for a scholarship')"
-                className="border border-gray-300 p-2 w-full rounded-lg"
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-              />
-              <button
-                onClick={handleAIContent}
-                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-              >
-                Generate with AI
-              </button>
-            </div>
-            <ReactQuill
-              value={documentContent}
-              onChange={setDocumentContent}
-              className="h-64 mb-4"
-            />
-          </>
-        ) : (
-          <ReactQuill
-            value={documentContent}
-            onChange={setDocumentContent}
-            className="h-64 mb-4"
-          />
-        )}
-
-        <div className="flex justify-end">
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            {isSaving ? 'Saving...' : 'Save Document'}
-          </button>
-          <button
-            onClick={onClose}
-            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
-          >
-            Cancel
-          </button>
+      {/* Formatting toolbar */}
+      <div className="flex justify-between items-center p-2 border-t bg-gray-100">
+        <div className="flex space-x-4">
+          <button onClick={() => applyFormat('bold')}><Bold size={20} /></button>
+          <button onClick={() => applyFormat('italic')}><Italic size={20} /></button>
+          <button onClick={() => applyFormat('underline')}><Underline size={20} /></button>
+          <button onClick={() => applyFormat('createLink')}><Link size={20} /></button>
+          <button onClick={() => applyFormat('insertUnorderedList')}><List size={20} /></button>
+          <button><GripVertical size={20} /></button>
         </div>
+        <button
+          onClick={() => handleSave(false)}
+          disabled={isSaving}
+          className="text-blue-500 font-semibold"
+        >
+          {isSaving ? 'Saving...' : 'Save'}
+        </button>
       </div>
     </div>
   );
 };
 
+// Prop validation
+DocumentCreate.propTypes = {
+  documentId: PropTypes.string,
+  onClose: PropTypes.func.isRequired, // Ensure onClose is required and should be a function
+};
+
 export default DocumentCreate;
+
 
 
