@@ -15,30 +15,39 @@ export const Onboarding2 = () => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         const email = user.email;
-        const userId = user.uid; // Get user ID from Firebase Authentication
+        const userId = user.uid;
         setUserEmail(email);
         localStorage.setItem('userEmail', email);
-        localStorage.setItem('userId', userId); // Store user ID in local storage
+        localStorage.setItem('userId', userId);
+
         const metadata = user.metadata;
         const isUserNew = metadata.creationTime === metadata.lastSignInTime;
         setIsNewUser(isUserNew);
-        setIsLoading(false);
+        
+        // Check if the onboarding process has been completed before
+        const onboardingSeen = localStorage.getItem('onboardingSeen');
+        if (!isUserNew && onboardingSeen === 'true') {
+          // User has already completed onboarding, redirect to home
+          navigate('/home');
+        } else {
+          setIsLoading(false); // Only stop loading if the user hasn't completed onboarding
+        }
       } else {
         setError('User not signed in');
-        navigate('/onboarding1'); // Redirect to onboarding1 if not signed in
+        navigate('/onboarding1');
       }
     });
-    return () => unsubscribe(); // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, [navigate]);
 
   const handleContinue = () => {
-    navigate('/onboarding3'); // Always navigate to onboarding3
+    navigate('/onboarding3');
   };
 
   const handleLater = () => {
     localStorage.setItem('onboardingSeen', 'true');
-    localStorage.removeItem('userId'); // Remove user ID from local storage
-    navigate('/home'); // Navigate to home if "I'll do this later" is clicked
+    localStorage.removeItem('userId');
+    navigate('/home');
   };
 
   if (isLoading) {
