@@ -1,0 +1,46 @@
+.container{
+    position: relative;
+    height: 100vh;
+    width: 100%;
+}
+
+.row{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor,
+.preview{
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.editor-input{
+    height: 100vh;
+    width: 100%;
+}
+
+/* Ensure toolbar items are visible */
+.ql-toolbar .ql-picker-label, .ql-toolbar .ql-picker-item, .ql-toolbar button {
+    color: black !important; /* Ensure text is visible */
+    border-color: black !important; /* Ensure borders are visible */
+}
+
+/* Add a border to toolbar buttons */
+.ql-toolbar button {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    background-color: white;
+}
+
+/* Ensure background is visible for dropdowns */
+.ql-picker-options {
+    background-color: white;
+}
