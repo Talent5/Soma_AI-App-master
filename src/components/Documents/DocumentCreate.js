@@ -133,29 +133,29 @@ const DocumentCreate = ({ documentId }) => {
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-white flex flex-col">
-      <div className="flex justify-start top-0 left-0">
-        <button onClick={() => navigate('/documents')} className="mr-4 text-2xl text-gray-600 hover:text-gray-800">
-          ←
-        </button>
-        <input
-          type="text"
-          value={documentTitle}
-          onChange={handleTitleChange}
-          className="flex-grow text-lg font-normal border-none outline-none"
-          placeholder="Untitled Document"
-        />
-      </div>
+    <div className="container">
+      <div className="row">
+        <div className="editor">
+          <input
+            type="text"
+            value={documentTitle}
+            onChange={handleTitleChange}
+            className="document-title"
+            placeholder="Untitled Document"
+          />
+          <ReactQuill
+            ref={editorRef}
+            value={documentContent}
+            onChange={handleEditorChange}
+            modules={{
+              toolbar: isKeyboardActive ? [['bold', 'italic'], [{ 'list': 'ordered' }, { 'list': 'bullet' }]] : false
+            }}
+            className="editor-input"
+          />
+        </div>
 
-      <ReactQuill
-        ref={editorRef}
-        value={documentContent}
-        onChange={handleEditorChange}
-        modules={{
-          toolbar: isKeyboardActive ? [['bold', 'italic'], [{ 'list': 'ordered' }, { 'list': 'bullet' }]] : false
-        }}
-        className="flex-grow"
-      />
+        <div className="preview" dangerouslySetInnerHTML={{ __html: documentContent }} />
+      </div>
 
       {/* Button to bring up AI prompt */}
       <button
