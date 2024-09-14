@@ -83,9 +83,9 @@ export const FieldOfStudy = () => {
   };
 
   return (
-    <main className='gap-4 mt-4'>
+    <main className='gap-4 mx-2 mt-4'>
       <div className="top-4 left-4">
-        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl px-4">Field of Study</i>
+        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl px-2">Field of Study</i>
       </div>
       <div className="bg-white p-4 rounded-lg shadow-md max-w-md mx-auto my-2">
         <form onSubmit={(e) => e.preventDefault()}>
@@ -154,7 +154,7 @@ export const FieldOfStudy = () => {
             <button
               onClick={handleSave}
               disabled={loading}
-              className="px-4 py-2 bg-[#1E1548] text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300"
+              className="px-4 py-2 bg-[#1E1548] text-white rounded-full hover:bg-blue-600 disabled:bg-gray-300"
             >
               {loading ? 'Saving...' : 'Save changes'}
             </button>

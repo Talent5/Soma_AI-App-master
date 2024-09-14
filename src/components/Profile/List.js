@@ -4,7 +4,7 @@ import ListItem from './ListItem';
 
 const List = ({ items }) => {
     return (
-        <div className="w-full">
+        <div className="w-full m-2">
             {items.map((item, index) => (
                 <ListItem key={index} label={item.label} path={item.path} />
             ))}

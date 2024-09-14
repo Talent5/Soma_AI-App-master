@@ -12,7 +12,7 @@ const ProfileScreen = () => {
     ];
 
     return (
-        <div className="p-4 bg-slate-50">
+        <div className="p-4 bg-slate-50 rounded-lg gap-1">
             <List items={menuItems} />
         </div>
     );

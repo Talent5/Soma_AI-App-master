@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
-import { db, storage } from '../config/firebase'; // Import Firestore and Storage
-import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Firestore functions
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'; // Firebase Storage functions
+import { db, storage } from '../config/firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from 'react-router-dom';
 
 export const PersonalInformation = () => {
@@ -21,9 +21,8 @@ export const PersonalInformation = () => {
   const fileInputRef = useRef(null);
   const cvInputRef = useRef(null);
   const userId = localStorage.getItem('userId');
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
 
-  // Fetch user's information from Firestore
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -52,7 +51,6 @@ export const PersonalInformation = () => {
     fetchUserData();
   }, [userId]);
 
-  // Handle profile picture change
   const handleProfilePicChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -71,12 +69,10 @@ export const PersonalInformation = () => {
     }
   };
 
-  // Trigger file input when profile picture is clicked
   const handleProfilePicClick = () => {
     fileInputRef.current?.click();
   };
 
-  // Handle CV file change
   const handleCvChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -86,7 +82,7 @@ export const PersonalInformation = () => {
         const downloadURL = await getDownloadURL(storageRef);
         const userDocRef = doc(db, 'users', userId);
         await updateDoc(userDocRef, { cv: downloadURL });
-        setUserData(prevData => ({ ...prevData, cv: downloadURL }));
+        setUserData((prevData) => ({ ...prevData, cv: downloadURL }));
         alert('CV uploaded successfully!');
       } catch (error) {
         console.error('Error uploading CV:', error);
@@ -95,12 +91,10 @@ export const PersonalInformation = () => {
     }
   };
 
-  // Handle input change
   const handleInputChange = (field, value) => {
-    setUserData(prevData => ({ ...prevData, [field]: value }));
+    setUserData((prevData) => ({ ...prevData, [field]: value }));
   };
 
-  // Handle save button click
   const handleSave = async () => {
     const userDocRef = doc(db, 'users', userId);
     try {
@@ -113,18 +107,18 @@ export const PersonalInformation = () => {
   };
 
   const handleBackClick = () => {
-    navigate(-1); // Go back to the previous page
+    navigate(-1);
   };
 
   return (
-    <main className='gap-4 mt-4'>
-      <div className="top-4 left-4">
-        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl px-4">Personal Information</i>
+    <main className='p-4'>
+      <div className="mb-4">
+        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl text-gray-700"> Personal Information</i>
       </div>
-      <div className="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto my-2">
-        <div className="flex items-center mt-4">
+      <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+        <div className="flex items-center mb-6">
           <div
-            className="w-14 h-14 rounded-full overflow-hidden cursor-pointer"
+            className="w-16 h-16 rounded-full overflow-hidden cursor-pointer"
             onClick={handleProfilePicClick}
           >
             {profilePicture ? (
@@ -135,7 +129,7 @@ export const PersonalInformation = () => {
               />
             ) : (
               <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <i className="bi bi-person text-4xl"></i>
+                <i className="bi bi-person text-4xl text-gray-500"></i>
               </div>
             )}
           </div>
@@ -147,10 +141,9 @@ export const PersonalInformation = () => {
           />
         </div>
 
-        {/* Input Fields */}
-        {['firstName', 'middleName', 'lastName', 'dateOfBirth', 'phoneNumber', 'nationality'].map(field => (
+        {['firstName', 'middleName', 'lastName', 'email', 'dateOfBirth', 'phoneNumber', 'nationality'].map((field) => (
           <div key={field} className="mb-4">
-            <label className="block text-gray-700 text-sm font-normal mb-1 capitalize">
+            <label className="block text-gray-700 text-sm font-medium mb-2 capitalize">
               {field.replace(/([A-Z])/g, ' $1').toLowerCase()}
             </label>
             <input
@@ -158,20 +151,19 @@ export const PersonalInformation = () => {
               value={userData[field]}
               onChange={(e) => handleInputChange(field, e.target.value)}
               readOnly={field === 'email'}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
         ))}
 
-        {/* CV Upload */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-normal mb-1">Upload CV</label>
+          <label className="block text-gray-700 text-sm font-medium mb-2">Upload CV</label>
           <div
-            className="w-full px-3 py-2 border border-gray-300 rounded-md cursor-pointer"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md cursor-pointer"
             onClick={() => cvInputRef.current?.click()}
           >
             {userData.cv ? (
-              <a href={userData.cv} target="_blank" rel="noopener noreferrer" className="text-blue-500">View CV</a>
+              <a href={userData.cv} target="_blank" rel="noopener noreferrer" className="text-indigo-600">View CV</a>
             ) : (
               <span className="text-gray-500">Click to upload CV</span>
             )}
@@ -184,10 +176,10 @@ export const PersonalInformation = () => {
           />
         </div>
 
-        <div className="mt-6 mb-8">
+        <div className="mt-6">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-[#1E1548] text-white rounded-md hover:bg-blue-600"
+            className="w-full py-2 bg-[#1E1548] text-white rounded-full hover:bg-indigo-700"
           >
             Save Changes
           </button>
