@@ -85,13 +85,13 @@ export const FieldOfStudy = () => {
   return (
     <main className='gap-4 mx-2 mt-4'>
       <div className="top-4 left-4">
-        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl px-2">Field of Study</i>
+        <i onClick={handleBackClick} className="bi bi-arrow-left text-2xl px-2">Field of Study</i>
       </div>
       <div className="bg-white p-4 rounded-lg shadow-md max-w-md mx-auto my-2">
         <form onSubmit={(e) => e.preventDefault()}>
           {/* Intended Field of Study */}
           <div className="mb-4">
-            <label className="block text-black text-m font-normal mb-1">Intended Field of Study</label>
+            <label className="block text-black text-xl font-normal mb-1">Intended Field of Study</label>
             <select
               value={userData.intendedFieldOfStudy}
               onChange={(e) => handleInputChange('intendedFieldOfStudy', e.target.value)}
@@ -108,42 +108,38 @@ export const FieldOfStudy = () => {
 
           {/* Degree Type */}
           <div className="mb-4">
-            <label className="block text-black text-m font-normal mb-1">Degree Type</label>
-            <div className="radio-group mb-2">
-              <label>
+            <label className="block text-black text-xl font-normal mb-1">Degree Type</label>
+            <div className="flex flex-col space-y-2">
+              <label className="flex items-center">
                 <input
                   type="radio"
                   name="degreeType"
                   value="Bachelors"
                   checked={userData.degreeType === 'Bachelors'}
                   onChange={(e) => handleInputChange('degreeType', e.target.value)}
-                  disabled
+                  className="mr-2"
                 />
                 Bachelors
               </label>
-            </div>
-            <div className="radio-group mb-2">
-              <label>
+              <label className="flex items-center">
                 <input
                   type="radio"
                   name="degreeType"
                   value="Masters"
                   checked={userData.degreeType === 'Masters'}
                   onChange={(e) => handleInputChange('degreeType', e.target.value)}
-                  disabled
+                  className="mr-2"
                 />
                 Masters
               </label>
-            </div>
-            <div className="radio-group mb-2">
-              <label>
+              <label className="flex items-center">
                 <input
                   type="radio"
                   name="degreeType"
                   value="PhD"
                   checked={userData.degreeType === 'PhD'}
                   onChange={(e) => handleInputChange('degreeType', e.target.value)}
-                  disabled
+                  className="mr-2"
                 />
                 PhD
               </label>
@@ -166,3 +162,4 @@ export const FieldOfStudy = () => {
 };
 
 export default FieldOfStudy;
+

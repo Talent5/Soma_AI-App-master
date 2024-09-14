@@ -1,95 +1,172 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { db } from '../config/firebase'; // Ensure this path is correct
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const ExtracurricularActivities = () => {
     const [activities, setActivities] = useState({
-        sports: '',
+        sports: [],
         clubs: '',
         volunteerExperience: '',
         leadershipRoles: '',
-        awards: '',
     });
+    const [currentSport, setCurrentSport] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const userId = localStorage.getItem('userId');
 
-    // Handle input changes
+    useEffect(() => {
+        const fetchUserData = async () => {
+            setLoading(true);
+            try {
+                const userDocRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    setActivities({
+                        sports: data.sports || [],
+                        clubs: data.clubs || '',
+                        volunteerExperience: data.volunteerExperience || '',
+                        leadershipRoles: data.leadershipRoles || '',
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [userId]);
+
     const handleInputChange = (field, value) => {
         setActivities(prevState => ({ ...prevState, [field]: value }));
     };
 
+    const handleAddSport = (e) => {
+        e.preventDefault();
+        if (currentSport && !activities.sports.includes(currentSport)) {
+            setActivities(prevState => ({
+                ...prevState,
+                sports: [...prevState.sports, currentSport]
+            }));
+            setCurrentSport('');
+        }
+    };
+
+    const handleRemoveSport = (sport) => {
+        setActivities(prevState => ({
+            ...prevState,
+            sports: prevState.sports.filter(s => s !== sport)
+        }));
+    };
+
+    const handleSave = async () => {
+        setLoading(true);
+        const userDocRef = doc(db, 'users', userId);
+        try {
+            await updateDoc(userDocRef, { ...activities });
+            alert('Information updated successfully!');
+        } catch (error) {
+            console.error('Error updating information:', error);
+            alert('Failed to update information.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
-        <div className="p-6 bg-gray-50 min-h-screen flex flex-col">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Extracurricular Activities</h2>
-            <form className="space-y-6 bg-white p-6 rounded-lg shadow-md">
-                {/* Sports */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">Sports (Optional)</label>
-                    <input
-                        type="text"
-                        value={activities.sports}
-                        onChange={(e) => handleInputChange('sports', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter any sports activities"
-                    />
-                </div>
+        <main className='p-4'>
+            <div className="mb-4">
+                <i onClick={handleBackClick} className="bi bi-arrow-left text-2xl text-black"> Extracurricular Activities</i>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+                <form onSubmit={(e) => e.preventDefault()}>
+                    <div className="mb-4">
+                        <label className="block text-black text-xl gap-2 font-medium mb-2">Sports (optional)</label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {activities.sports.map(sport => (
+                                <span key={sport} className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+                                    {sport}
+                                    <button type="button" onClick={() => handleRemoveSport(sport)} className="ml-1 text-gray-500 hover:text-gray-700">
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex-grow">
+                                <input
+                                    type="text"
+                                    value={currentSport}
+                                    onChange={(e) => setCurrentSport(e.target.value)}
+                                    onKeyPress={(e) => e.key === 'Enter' && handleAddSport(e)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-md box-border focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    placeholder="Type a sport e.g running"
+                                />
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleAddSport}
+                                className="ml-2 px-4 w-5 h-10 py-2 bg-[#1E1548] text-white rounded-md hover:bg-indigo-700"
+                            >
+                                Add
+                            </button>
+                        </div>
+                    </div>
 
-                {/* Clubs */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">Clubs (Optional)</label>
-                    <input
-                        type="text"
-                        value={activities.clubs}
-                        onChange={(e) => handleInputChange('clubs', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter any club memberships"
-                    />
-                </div>
+                    <div className="mb-4">
+                        <label className="block text-black text-xl font-medium mb-2">Clubs (optional)</label>
+                        <input
+                            type="text"
+                            value={activities.clubs}
+                            onChange={(e) => handleInputChange('clubs', e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md box-border focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Type a club e.g debate club"
+                        />
+                    </div>
 
-                {/* Volunteer Experience */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">Volunteer Experience (Optional)</label>
-                    <input
-                        type="text"
-                        value={activities.volunteerExperience}
-                        onChange={(e) => handleInputChange('volunteerExperience', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Describe any volunteer experience"
-                    />
-                </div>
+                    <div className="mb-4">
+                        <label className="block text-black text-xl font-medium mb-2">Volunteer experience (optional)</label>
+                        <textarea
+                            value={activities.volunteerExperience}
+                            onChange={(e) => handleInputChange('volunteerExperience', e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md box-border focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            rows="3"
+                            placeholder="Type your experience"
+                        ></textarea>
+                    </div>
 
-                {/* Leadership Roles */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">Leadership Roles (Optional)</label>
-                    <input
-                        type="text"
-                        value={activities.leadershipRoles}
-                        onChange={(e) => handleInputChange('leadershipRoles', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="List any leadership roles"
-                    />
-                </div>
+                    <div className="mb-4">
+                        <label className="block text-black text-xl font-medium mb-2">Leadership roles (optional)</label>
+                        <textarea
+                            value={activities.leadershipRoles}
+                            onChange={(e) => handleInputChange('leadershipRoles', e.target.value)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-md box-border focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            rows="3"
+                            placeholder="Type your experience"
+                        ></textarea>
+                    </div>
 
-                {/* Awards */}
-                <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">Awards (Optional)</label>
-                    <input
-                        type="text"
-                        value={activities.awards}
-                        onChange={(e) => handleInputChange('awards', e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Enter any awards received"
-                    />
-                </div>
-
-                {/* Save Button */}
-                <div className="flex justify-end mt-6">
-                    <button
-                        type="submit"
-                        className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        Save
-                    </button>
-                </div>
-            </form>
-        </div>
+                    <div className="mt-6">
+                        <button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="w-full py-2 bg-[#1E1548] text-white rounded-full hover:bg-indigo-700 disabled:bg-gray-300"
+                        >
+                            {loading ? 'Saving...' : 'Save changes'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
     );
 };
 
 export default ExtracurricularActivities;
+

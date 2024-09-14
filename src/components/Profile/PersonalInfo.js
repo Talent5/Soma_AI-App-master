@@ -13,7 +13,7 @@ export const PersonalInformation = () => {
     middleName: '',
     lastName: '',
     dateOfBirth: '',
-    email: '',
+    emailAddress: '',
     phoneNumber: '',
     nationality: '',
     cv: null,
@@ -113,7 +113,7 @@ export const PersonalInformation = () => {
   return (
     <main className='p-4'>
       <div className="mb-4">
-        <i onClick={handleBackClick} className="bi bi-arrow-left text-xl text-gray-700"> Personal Information</i>
+        <i onClick={handleBackClick} className="bi bi-arrow-left text-2xl text-gray-700"> Personal Information</i>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
         <div className="flex items-center mb-6">
@@ -141,7 +141,7 @@ export const PersonalInformation = () => {
           />
         </div>
 
-        {['firstName', 'middleName', 'lastName', 'email', 'dateOfBirth', 'phoneNumber', 'nationality'].map((field) => (
+        {['firstName', 'middleName', 'lastName', 'emailAddress', 'dateOfBirth', 'phoneNumber', 'nationality'].map((field) => (
           <div key={field} className="mb-4">
             <label className="block text-gray-700 text-sm font-medium mb-2 capitalize">
               {field.replace(/([A-Z])/g, ' $1').toLowerCase()}
