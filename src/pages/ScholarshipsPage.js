@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SearchFilters } from "../components/Scholaship/SearchFilters";
-import ScholarshipItem from '../components/Scholaship/ScholarshipItem';
+import { SearchFilters } from '../components/Scholaship/SearchFilters';
+import ScholarshipCards from '../components/Scholaship/ScholarshipCards';
 import { NavBar } from '../components/NavBar';
+import { db } from '../components/config/firebase'; // Import your Firebase configuration
+import { getDoc, doc } from 'firebase/firestore';
 
 export const ScholarshipsPage = () => {
   const [searchValue, setSearchValue] = useState('');
@@ -9,31 +11,55 @@ export const ScholarshipsPage = () => {
   const [scholarships, setScholarships] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
   const fetchScholarships = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    if (!userId) {
+      setError('No user ID found.');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
-      const response = await fetch('https://somaai.onrender.com/api/user/:userid', {
-        mode: 'cors', // Explicitly set CORS mode
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const recommendationDoc = doc(db, 'scholarship_recommendations', userId);
+      const docSnap = await getDoc(recommendationDoc);
+      
+      if (!docSnap.exists()) {
+        setError('No scholarships found.');
+        setScholarships([]);
+        return;
       }
-      const data = await response.json();
-      console.log('Fetched data:', data);
-      setScholarships(Array.isArray(data) ? data : []);
+
+      const data = docSnap.data();
+      const scholarships = data.recommendations || []; // Access the 'recommendations' field in the document
+      
+      setScholarships(scholarships);
     } catch (error) {
       console.error('Error fetching scholarships:', error);
-      setError('Failed to fetch scholarships. Please check your network connection and try again.');
+      setError(`Failed to fetch scholarships: ${error.message}`);
     } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    console.log('Stored User ID:', storedUserId); // Check if the correct userId is retrieved
+    if (storedUserId) {
+      setUserId(storedUserId);
+    } else {
+      setError('User ID not found in localStorage.');
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchScholarships();
-  }, [fetchScholarships]);
+    if (userId) {
+      fetchScholarships();
+    }
+  }, [fetchScholarships, userId]);
 
   const filteredScholarships = scholarships.filter(scholarship =>
     scholarship.title.toLowerCase().includes(searchValue.toLowerCase())
@@ -76,15 +102,7 @@ export const ScholarshipsPage = () => {
         {!isLoading && !error && filteredScholarships.length === 0 && (
           <p>No scholarships found. Try adjusting your search.</p>
         )}
-        {!isLoading && !error && filteredScholarships.map((scholarship) => (
-          <ScholarshipItem
-            key={scholarship.id}
-            logo={scholarship.logo}
-            title={scholarship.title}
-            amount={scholarship.amount}
-            deadline={scholarship.deadline ? new Date(scholarship.deadline).toLocaleDateString() : 'No deadline'}
-          />
-        ))}
+        {!isLoading && !error && <ScholarshipCards scholarships={filteredScholarships} />}
       </div>
       <NavBar />
     </div>

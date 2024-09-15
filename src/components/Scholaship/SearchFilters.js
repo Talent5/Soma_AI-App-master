@@ -4,11 +4,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export const SearchFilters = ({ searchValue, setSearchValue, filter, setFilter }) => {
   return (
-    <header className="bg-transparent">
+    <header className="bg-transparent mb-4">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Scholarships</h1>
-      <div className="flex items-center ">
-        <div className="flex items-center border border-{#A6AEB2} rounded-full p-2 shadow-sm">
-          <i className="bi bi-search h-5 w-5 text-{#838F94}"></i>
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center border border-gray-300 rounded-full p-2 shadow-sm">
+          <i className="bi bi-search h-5 w-5 text-gray-500"></i>
           <input
             className="w-full border-none bg-transparent text-gray-700 text-sm px-2 py-1 rounded ml-2 focus:outline-none"
             placeholder="Search scholarship"
@@ -18,7 +18,7 @@ export const SearchFilters = ({ searchValue, setSearchValue, filter, setFilter }
             type="text"
           />
         </div>
-        <div className="flex space-x-4 ml-4">
+        <div className="flex space-x-4">
           <span
             className="p-2 rounded-full border-0 cursor-pointer hover:bg-gray-100"
             onClick={() => setFilter('filter1')} // Example filter logic
