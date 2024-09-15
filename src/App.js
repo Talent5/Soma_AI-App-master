@@ -14,6 +14,7 @@ import { ProgressProvider } from './components/Onboarding/ProgressContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { SplashScreen } from './components/SplashScreen';
 import { Content } from './pages/Content';
+import { AuthRouter } from './components/AuthRouter'; // New import
 import { Onboarding1 } from './components/Onboarding/Onboarding1';
 import { Onboarding2 } from './pages/Onboarding2';
 import { Onboarding3 } from './components/Onboarding/Onboarding3';
@@ -47,7 +48,7 @@ import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage';
 import { DocumentPage } from './pages/DocumentPage';
-import AllRoutes from './routes/AllRoutes'; // Ensure you have this file for managing routes
+import AllRoutes from './routes/AllRoutes';
 import './global.css';
 import './styleguide.css';
 import './App.css';
@@ -141,6 +142,11 @@ function App() {
     '/profile',
     '/personal-information',
     '/',
+    '/singup',
+    '/educational-information',
+    '/field-of-study',
+    '/extracurricular-activities',
+    '/financial-information'
   ].includes(location.pathname);
 
   return (
@@ -155,6 +161,8 @@ function App() {
               {shouldShowNavbar && <NavBar location={location} />}
               <Routes>
                 <Route path="/" element={<Content />} />
+                <Route path="/singup" element={<Content />} />
+                <Route path="/onboarding1" element={<Onboarding1 />} />
                 <Route path="/onboarding2" element={<Onboarding2 />} />
                 <Route path="/onboarding3" element={<Onboarding3 />} />
                 <Route path="/onboarding4" element={<Onboarding4 />} />
@@ -186,7 +194,7 @@ function App() {
                 <Route path="/Scholarships" element={<ScholarshipsPage />} />
                 <Route path="/documents" element={<DocumentPage />} />
                 <Route path="/create" element={<DocumentCreate />} />
-                <Route path="*" element={<AllRoutes />} /> {/* Ensure this handles any route not matched */}
+                <Route path="*" element={<AllRoutes />} />
               </Routes>
             </FormDataProvider>
           )}

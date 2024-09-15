@@ -1,7 +1,9 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import Header from '../components/Welcome/Header';
+import { handleLogout } from '../components/AuthRouter'; // Import the logout function
 
 export const Onboarding2 = () => {
   const navigate = useNavigate();
@@ -34,7 +36,7 @@ export const Onboarding2 = () => {
         }
       } else {
         setError('User not signed in');
-        navigate('/onboarding1');
+        navigate('/singup');
       }
     });
     return () => unsubscribe();
@@ -104,6 +106,7 @@ export const Onboarding2 = () => {
     </div>
   );
 };
+
 
 
 
