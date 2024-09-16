@@ -109,7 +109,7 @@ const ScholarshipDetail = () => {
     }
 
     return (
-        <div className="relative max-w-md mx-auto bg-purple-50 min-h-screen p-2">
+        <div className="relative max-w-md bg-purple-50 min-h-screen p-2 h-full">
             <BackButton />
             <ScholarshipDetailContent scholarship={scholarship} handleApply={handleApply} />
         </div>
