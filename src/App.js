@@ -46,7 +46,8 @@ import { ReviewAndEdit } from './components/Onboarding/ReviewAndEdit';
 import DocumentCreate from './components/Documents/DocumentCreate';
 import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
-import { ScholarshipsPage } from './pages/ScholarshipsPage';
+import { ScholarshipsPage } from './pages/ScholarshipsPage'
+import ScholarshipDetail  from './pages/ScholarshipDetail';
 import { DocumentPage } from './pages/DocumentPage';
 import AllRoutes from './routes/AllRoutes';
 import './global.css';
@@ -192,6 +193,7 @@ function App() {
                 <Route path="/review-edit" element={<ReviewAndEdit />} />
                 <Route path="/home" element={<Dashboard />} />
                 <Route path="/Scholarships" element={<ScholarshipsPage />} />
+                <Route path="/scholarship/:id" element={<ScholarshipDetail />} /> 
                 <Route path="/documents" element={<DocumentPage />} />
                 <Route path="/create" element={<DocumentCreate />} />
                 <Route path="*" element={<AllRoutes />} />

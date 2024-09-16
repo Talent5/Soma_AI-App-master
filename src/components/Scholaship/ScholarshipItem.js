@@ -1,10 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'; // Import Link
 import placeholderImage from '../assets/logo192.png';
 
-const ScholarshipItem = ({ logo, title, amount, deadline, applicationLink, description, eligibility, score }) => {
+const ScholarshipItem = ({ id, logo, title, amount, deadline }) => {
+  // Debugging line to check values
+
+  if (!id) {
+    console.error('ScholarshipItem is missing id:', { id, logo, title, amount, deadline });
+    return null;
+  }
+
   return (
-    <div className="p-4 mb-4 border-b border-gray-300">
+    <Link to={`/scholarship/${id}`} className="block p-4 mb-4 border-b border-gray-300 hover:bg-gray-100">
       <div className="flex items-start space-x-4">
         <img
           src={logo || placeholderImage}
@@ -18,45 +26,26 @@ const ScholarshipItem = ({ logo, title, amount, deadline, applicationLink, descr
             <span className="mx-2">·</span>
             <span className="font-medium">Deadline:</span> {deadline || 'N/A'}
           </div>
-          {applicationLink && (
-            <a
-              href={applicationLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 underline"
-            >
-              Apply Here
-            </a>
-          )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
 ScholarshipItem.propTypes = {
+  id: PropTypes.string.isRequired, // Add the id prop for linking
   logo: PropTypes.string,
   title: PropTypes.string.isRequired,
   amount: PropTypes.string,
   deadline: PropTypes.string,
-  applicationLink: PropTypes.string,
-  description: PropTypes.string,
-  eligibility: PropTypes.string,
-  score: PropTypes.number,
 };
 
 ScholarshipItem.defaultProps = {
   logo: '/placeholder-icon.png',
   amount: 'N/A',
   deadline: 'No deadline provided',
-  applicationLink: '',
-  description: 'No description available',
-  eligibility: 'No eligibility information available',
 };
 
 export default ScholarshipItem;
-
-
-
 
 

@@ -9,14 +9,11 @@ const ScholarshipCards = ({ scholarships }) => {
       {scholarships.map((scholarship) => (
         <ScholarshipItem
           key={scholarship.id}
+          id={scholarship.id} // Pass the id prop
           logo={scholarship.logo || placeholderImage}
           title={scholarship.title}
           amount={scholarship.amount}
           deadline={scholarship.deadline ? new Date(scholarship.deadline).toLocaleDateString() : 'No deadline'}
-          applicationLink={scholarship.application_link}
-          description={scholarship.description}
-          eligibility={scholarship.eligibility}
-          score={scholarship.score}
         />
       ))}
     </div>
@@ -30,14 +27,11 @@ ScholarshipCards.propTypes = {
     title: PropTypes.string.isRequired,
     amount: PropTypes.string,
     deadline: PropTypes.string,
-    application_link: PropTypes.string,
-    description: PropTypes.string,
-    eligibility: PropTypes.string,
-    score: PropTypes.number,
   })).isRequired,
 };
 
 export default ScholarshipCards;
+
 
 
 
