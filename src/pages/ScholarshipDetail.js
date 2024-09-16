@@ -83,7 +83,7 @@ const ScholarshipDetail = () => {
 
     if (error) {
         return (
-            <div className="max-w-md mx-auto p-4 border border-red-200 rounded">
+            <div className="mx-2 border border-red-200 rounded my-4">
                 <p className="text-red-500">{error}</p>
                 <button
                     onClick={handleRetry}
@@ -105,11 +105,11 @@ const ScholarshipDetail = () => {
     }
 
     if (!scholarship) {
-        return <div className="text-center mt-4">No scholarship details available.</div>;
+        return <div className="text-center my-4">No scholarship details available.</div>;
     }
 
     return (
-        <div className="relative max-w-md bg-purple-50 min-h-screen p-2 h-full">
+        <div className="my-4 bg-purple-50 min-h-screen mx-3">
             <BackButton />
             <ScholarshipDetailContent scholarship={scholarship} handleApply={handleApply} />
         </div>
