@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 // src/App.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Routes,
   Route,
@@ -49,6 +50,7 @@ import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage'
 import ScholarshipDetail  from './pages/ScholarshipDetail';
+import MobileCheckMessage from './MobileCheckMessage';
 import { DocumentPage } from './pages/DocumentPage';
 import AllRoutes from './routes/AllRoutes';
 import './global.css';
@@ -59,6 +61,15 @@ function RouteEffects() {
   const action = useNavigationType();
   const location = useLocation();
   const pathname = location.pathname;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+      // Redirect non-mobile users
+      navigate('/not-supported');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (action !== 'POP') {
@@ -148,13 +159,15 @@ function App() {
     '/educational-information',
     '/field-of-study',
     '/extracurricular-activities',
-    '/financial-information'
+    '/financial-information',
+    '/not-supported'
   ].includes(location.pathname);
 
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <AudioProvider>
         <ProgressProvider>
+          <MobileCheckMessage />
           {showSplash ? (
             <SplashScreen />
           ) : (
