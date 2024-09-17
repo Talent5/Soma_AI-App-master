@@ -12,17 +12,23 @@ const useApplicationCounts = (userId) => {
   useEffect(() => {
     const fetchCounts = async () => {
       if (!userId) return;
-
       try {
         setLoading(true);
 
         // Count in-progress applications
-        const inProgressQuery = query(collection(db, 'inProgressApplications'), where('userId', '==', userId));
+        const inProgressQuery = query(
+          collection(db, 'inProgressApplications'),
+          where('userId', '==', userId)
+        );
         const inProgressSnapshot = await getDocs(inProgressQuery);
         const inProgressCount = inProgressSnapshot.size;
 
         // Count completed applications
-        const completedQuery = query(collection(db, 'applications', userId, 'submitted'));
+        const completedQuery = query(
+          collection(db, 'applications'),
+          where('userId', '==', userId),
+          where('status', '==', 'submitted')
+        );
         const completedSnapshot = await getDocs(completedQuery);
         const completedCount = completedSnapshot.size;
 
