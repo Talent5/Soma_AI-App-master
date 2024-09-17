@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/components/MobileCheckMessage.js
 import React, { useState, useEffect } from 'react';
 
