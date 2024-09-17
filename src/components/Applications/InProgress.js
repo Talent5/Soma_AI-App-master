@@ -4,12 +4,12 @@ import placeholderImage from '../assets/logo192.png';
 
 const InProgress = ({ scholarships }) => {
   return (
-    <div className="p-4">
+    <div className="p-2  bg-white rounded-lg">
       {scholarships.length === 0 ? (
         <p className="text-gray-500">No in-progress scholarships available.</p>
       ) : (
         scholarships.map((scholarship) => (
-          <div key={scholarship.id} className="bg-white p-4 rounded-lg shadow-md mb-4">
+          <div key={scholarship.id} className=" p-2 border-b">
             <div className="flex items-center">
               <img
                 src={scholarship.logo || placeholderImage}
