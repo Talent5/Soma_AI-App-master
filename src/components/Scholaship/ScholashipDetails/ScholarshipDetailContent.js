@@ -159,6 +159,8 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                 userId,
                 scholarshipId: scholarship.id,
                 title: scholarship.title,
+                amount: scholarship.amount || 0,
+                deadline: deadline,
                 submittedAt: new Date(),
             });
 

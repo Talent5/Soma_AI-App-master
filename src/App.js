@@ -44,6 +44,7 @@ import { Onboarding26 } from './components/Onboarding/Onboarding26';
 import { Onboarding27 } from './components/Onboarding/Onboarding27';
 import { ReviewAndEdit } from './components/Onboarding/ReviewAndEdit';
 import DocumentCreate from './components/Documents/DocumentCreate';
+import {ApplicationsPage} from './pages/ApplicationsPage';
 import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage'
@@ -195,6 +196,7 @@ function App() {
                 <Route path="/Scholarships" element={<ScholarshipsPage />} />
                 <Route path="/scholarship/:id" element={<ScholarshipDetail />} /> 
                 <Route path="/documents" element={<DocumentPage />} />
+                <Route path="/applications" element={<ApplicationsPage />} />
                 <Route path="/create" element={<DocumentCreate />} />
                 <Route path="*" element={<AllRoutes />} />
               </Routes>
