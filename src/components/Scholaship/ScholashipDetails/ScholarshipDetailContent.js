@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
-import { db } from '../../config/firebase'; // Adjust this import to match your firebase config file location
-import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import { doc, setDoc, deleteDoc, getDoc, collection } from 'firebase/firestore';
 
-const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
+const ScholarshipDetailContent = ({ scholarship }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [applicationStatus, setApplicationStatus] = useState('not_started');
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     useEffect(() => {
         const checkIfFavorite = async () => {
@@ -17,7 +19,22 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
             setIsFavorite(favoriteDoc.exists());
         };
 
+        const checkApplicationStatus = async () => {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+
+            const appRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+            const appDoc = await getDoc(appRef);
+
+            if (appDoc.exists()) {
+                setApplicationStatus(appDoc.data().status || 'submitted');
+            } else {
+                setApplicationStatus('not_started');
+            }
+        };
+
         checkIfFavorite();
+        checkApplicationStatus();
     }, [scholarship.id]);
 
     const deadline = scholarship.deadline ? (
@@ -29,6 +46,8 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
     ) : 'No deadline';
 
     const eligibility = Array.isArray(scholarship.eligibility) ? scholarship.eligibility : [];
+    const requirements = Array.isArray(scholarship.requirements) ? scholarship.requirements : [];
+    const process = scholarship.process ? scholarship.process : [];
 
     const handleAddToFavorites = async () => {
         setLoading(true);
@@ -67,6 +86,81 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
         }
     };
 
+    const handleApply = async () => {
+        setLoading(true);
+
+        try {
+            window.open(scholarship.application_link, '_blank');
+
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                console.error('User ID not found. Cannot apply.');
+                setLoading(false);
+                return;
+            }
+
+            const applicationsRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+
+            await setDoc(applicationsRef, {
+                status: 'in_progress',
+                title: scholarship.title || 'No title',
+                amount: scholarship.amount || 0,
+                deadline: deadline,
+                eligibility: scholarship.eligibility || [],
+                description: scholarship.description || 'No description available',
+                contactEmail: scholarship.contactEmail || 'No contact email',
+                contactPhone: scholarship.contactPhone || 'No contact phone',
+                startedAt: new Date(),
+            });
+
+            setApplicationStatus('in_progress');
+            setShowConfirmation(true);
+            console.log('Application marked as in progress!');
+        } catch (error) {
+            console.error('Error updating application status:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConfirmSubmission = async () => {
+        setLoading(true);
+
+        try {
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                console.error('User ID not found. Cannot confirm submission.');
+                setLoading(false);
+                return;
+            }
+
+            const applicationsRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+
+            await setDoc(applicationsRef, {
+                status: 'submitted',
+                submittedAt: new Date(),
+            }, { merge: true });
+
+            setApplicationStatus('submitted');
+            setShowConfirmation(false);
+            console.log('Application marked as submitted!');
+
+            // Add to completed applications collection
+            const completedRef = doc(collection(db, 'completedApplications'), `${userId}_${scholarship.id}`);
+            await setDoc(completedRef, {
+                userId,
+                scholarshipId: scholarship.id,
+                title: scholarship.title,
+                submittedAt: new Date(),
+            });
+
+        } catch (error) {
+            console.error('Error confirming submission:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <div className="p-2 mb-4 mt-12">
@@ -78,12 +172,32 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
                     Amount: ${scholarship.amount?.toLocaleString()} · Deadline: {deadline}
                 </p>
                 <div className="flex space-x-2 gap-2">
-                    <button 
-                        className="flex-grow bg-[#1E1548] h-10 text-white py-2 px-4 rounded-full"
-                        onClick={handleApply}
-                    >
-                        Apply
-                    </button>
+                    {applicationStatus === 'not_started' && (
+                        <button 
+                            className="flex-grow h-10 py-2 px-4 rounded-full bg-[#1E1548] text-white"
+                            onClick={handleApply}
+                            disabled={loading}
+                        >
+                            Apply
+                        </button>
+                    )}
+                    {applicationStatus === 'in_progress' && (
+                        <button 
+                            className="flex-grow h-10 py-2 px-4 rounded-full bg-yellow-500 text-white"
+                            onClick={() => setShowConfirmation(true)}
+                            disabled={loading}
+                        >
+                            Continue Application
+                        </button>
+                    )}
+                    {applicationStatus === 'submitted' && (
+                        <button 
+                            className="flex-grow h-10 py-2 px-4 rounded-full bg-green-500 text-white"
+                            disabled
+                        >
+                            Application Submitted
+                        </button>
+                    )}
                     <button 
                         className="p-2 border w-10 h-10 rounded-full flex items-center justify-center" 
                         aria-label="Add to favorites"
@@ -91,16 +205,37 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
                         disabled={loading}
                     >
                         {loading ? (
-                            <span className="loader"></span> // Add a loading spinner
+                            <span className="loader"></span>
                         ) : (
-                            <Heart className={`h-5 w-5  ${isFavorite ? 'text-[#1e1548] fill-current' : 'text-[#1E1548]'} ${isFavorite ? 'fill-[#1e1548]' : 'fill-none'}`} />
+                            <Heart className={`h-5 w-5 ${isFavorite ? 'text-[#1e1548] fill-current' : 'text-[#1E1548]'} ${isFavorite ? 'fill-[#1e1548]' : 'fill-none'}`} />
                         )}
                     </button>
-
                 </div>
             </div>
 
-            <div className="p-4 mb-4">
+            {showConfirmation && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded-lg">
+                        <h3 className="text-lg font-semibold mb-4">Have you completed your application?</h3>
+                        <div className="flex justify-end space-x-4">
+                            <button 
+                                className="px-4 py-2 bg-gray-300 rounded"
+                                onClick={() => setShowConfirmation(false)}
+                            >
+                                Not yet
+                            </button>
+                            <button 
+                                className="px-4 py-2 bg-green-500 text-white rounded"
+                                onClick={handleConfirmSubmission}
+                            >
+                                Yes, I've submitted
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="p-4 mb-4 gap-2">
                 <h3 className="text-lg font-semibold mb-2">Eligibility</h3>
                 <ul className="list-disc pl-5 space-y-1">
                     {eligibility.length > 0 ? (
@@ -108,14 +243,40 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
                             <li key={index}>{item}</li>
                         ))
                     ) : (
-                        <li>No eligibility information available.</li>
+                        <li>No eligibility information available, Click apply for more.</li>
                     )}
                 </ul>
             </div>
 
-            <div className="p-4 mb-4">
+            <div className="p-4 mb-4 gap-2">
                 <h3 className="text-lg font-semibold mb-2">Description</h3>
                 <p>{scholarship.description}</p>
+            </div>
+
+            <div className='p-4 mb-4 gap-2'>
+                <h3 className="text-lg font-semibold mb-2">Application requirements</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                    {requirements.length > 0 ? (
+                        requirements.map((item, index) => (
+                            <li key={index}>{item}</li>
+                        ))
+                    ) : (
+                        <li>No application requirements available, Click apply for more.</li>
+                    )}
+                </ul>
+            </div>
+
+            <div className='p-4 mb-4 gap-2'>
+                <h3 className="text-lg font-semibold mb-2">Application process</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                    {process.length > 0 ? (
+                        process.map((item, index) => (
+                            <li key={index}>{item}</li>
+                        ))
+                    ) : (
+                        <li>No application process available, click apply for more</li>
+                    )}
+                </ul>
             </div>
 
             <div className="p-4">
@@ -128,4 +289,5 @@ const ScholarshipDetailContent = ({ scholarship, handleApply }) => {
 };
 
 export default ScholarshipDetailContent;
+
 
