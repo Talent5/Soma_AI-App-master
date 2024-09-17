@@ -23,13 +23,20 @@ const ScholarshipDetailContent = ({ scholarship }) => {
             const userId = localStorage.getItem('userId');
             if (!userId) return;
 
-            const appRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
-            const appDoc = await getDoc(appRef);
+            const inProgressRef = doc(db, 'inProgressApplications', `${userId}_${scholarship.id}`);
+            const inProgressDoc = await getDoc(inProgressRef);
 
-            if (appDoc.exists()) {
-                setApplicationStatus(appDoc.data().status || 'submitted');
+            if (inProgressDoc.exists()) {
+                setApplicationStatus('in_progress');
             } else {
-                setApplicationStatus('not_started');
+                const submittedRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+                const submittedDoc = await getDoc(submittedRef);
+
+                if (submittedDoc.exists()) {
+                    setApplicationStatus('submitted');
+                } else {
+                    setApplicationStatus('not_started');
+                }
             }
         };
 
@@ -99,9 +106,11 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                 return;
             }
 
-            const applicationsRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+            const inProgressRef = doc(db, 'inProgressApplications', `${userId}_${scholarship.id}`);
 
-            await setDoc(applicationsRef, {
+            await setDoc(inProgressRef, {
+                userId,
+                scholarshipId: scholarship.id,
                 status: 'in_progress',
                 title: scholarship.title || 'No title',
                 amount: scholarship.amount || 0,
@@ -114,7 +123,6 @@ const ScholarshipDetailContent = ({ scholarship }) => {
             });
 
             setApplicationStatus('in_progress');
-            setShowConfirmation(true);
             console.log('Application marked as in progress!');
         } catch (error) {
             console.error('Error updating application status:', error);
@@ -134,16 +142,16 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                 return;
             }
 
-            const applicationsRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+            // Delete from in-progress applications
+            const inProgressRef = doc(db, 'inProgressApplications', `${userId}_${scholarship.id}`);
+            await deleteDoc(inProgressRef);
 
-            await setDoc(applicationsRef, {
+            // Add to submitted applications
+            const submittedRef = doc(db, 'applications', userId, 'submitted', scholarship.id);
+            await setDoc(submittedRef, {
                 status: 'submitted',
                 submittedAt: new Date(),
             }, { merge: true });
-
-            setApplicationStatus('submitted');
-            setShowConfirmation(false);
-            console.log('Application marked as submitted!');
 
             // Add to completed applications collection
             const completedRef = doc(collection(db, 'completedApplications'), `${userId}_${scholarship.id}`);
@@ -153,6 +161,10 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                 title: scholarship.title,
                 submittedAt: new Date(),
             });
+
+            setApplicationStatus('submitted');
+            setShowConfirmation(false);
+            console.log('Application marked as submitted!');
 
         } catch (error) {
             console.error('Error confirming submission:', error);
@@ -183,19 +195,19 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                     )}
                     {applicationStatus === 'in_progress' && (
                         <button 
-                            className="flex-grow h-10 py-2 px-4 rounded-full bg-yellow-500 text-white"
+                            className="flex-grow h-10 py-2 px-4 rounded-full border-blue-950 border bg-white text-[#1e1548]"
                             onClick={() => setShowConfirmation(true)}
                             disabled={loading}
                         >
-                            Continue Application
+                            Application Submitted?
                         </button>
                     )}
                     {applicationStatus === 'submitted' && (
                         <button 
-                            className="flex-grow h-10 py-2 px-4 rounded-full bg-green-500 text-white"
+                            className="flex-grow h-10 py-2 px-4 rounded-full bg-[#c1c546] text-black"
                             disabled
                         >
-                            Application Submitted
+                            You've Applied!
                         </button>
                     )}
                     <button 
@@ -217,15 +229,15 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded-lg">
                         <h3 className="text-lg font-semibold mb-4">Have you completed your application?</h3>
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-4 gap-2">
                             <button 
-                                className="px-4 py-2 bg-gray-300 rounded"
+                                className="px-4 py-2 bg-gray-300 rounded-full "
                                 onClick={() => setShowConfirmation(false)}
                             >
                                 Not yet
                             </button>
                             <button 
-                                className="px-4 py-2 bg-green-500 text-white rounded"
+                                className="px-4 py-2 bg-green-500 text-white rounded-full"
                                 onClick={handleConfirmSubmission}
                             >
                                 Yes, I've submitted
