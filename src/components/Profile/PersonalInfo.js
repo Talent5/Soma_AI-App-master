@@ -13,7 +13,7 @@ export const PersonalInformation = () => {
     middleName: '',
     lastName: '',
     dateOfBirth: '',
-    emailAddress: '',
+    emailAddress: '', // Updated field name
     phoneNumber: '',
     nationality: '',
     cv: null,
@@ -37,7 +37,7 @@ export const PersonalInformation = () => {
             middleName: userData.middleName || '',
             lastName: userData.lastName || '',
             dateOfBirth: userData.dateOfBirth || '',
-            email: userData.email || '',
+            emailAddress: userData.email || '', // Set the email address
             phoneNumber: userData.phoneNumber || '',
             nationality: userData.nationality || '',
             cv: userData.cv || null,
@@ -147,10 +147,9 @@ export const PersonalInformation = () => {
               {field.replace(/([A-Z])/g, ' $1').toLowerCase()}
             </label>
             <input
-              type={field === 'dateOfBirth' ? 'date' : field === 'email' ? 'email' : 'text'}
+              type={field === 'dateOfBirth' ? 'date' : field === 'emailAddress' ? 'email' : 'text'}
               value={userData[field]}
               onChange={(e) => handleInputChange(field, e.target.value)}
-              readOnly={field === 'email'}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>

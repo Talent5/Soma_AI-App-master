@@ -91,7 +91,7 @@ export const FieldOfStudy = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           {/* Intended Field of Study */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Intended Field of Study</label>
+            <label className="block text-black text-sm font-normal mb-1">Intended Field of Study</label>
             <select
               value={userData.intendedFieldOfStudy}
               onChange={(e) => handleInputChange('intendedFieldOfStudy', e.target.value)}
@@ -108,7 +108,7 @@ export const FieldOfStudy = () => {
 
           {/* Degree Type */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Degree Type</label>
+            <label className="block text-black text-sm font-normal mb-1">Degree Type</label>
             <div className="flex flex-col space-y-2">
               <label className="flex items-center">
                 <input

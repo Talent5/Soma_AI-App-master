@@ -14,6 +14,7 @@ import { AudioProvider } from './components/Welcome/AudioContext';
 import { ProgressProvider } from './components/Onboarding/ProgressContext';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { SplashScreen } from './components/SplashScreen';
+import {Root} from './pages/Root'
 import { Content } from './pages/Content';
 import { AuthRouter } from './components/AuthRouter'; // New import
 import { Onboarding1 } from './components/Onboarding/Onboarding1';
@@ -46,7 +47,6 @@ import { Onboarding27 } from './components/Onboarding/Onboarding27';
 import { ReviewAndEdit } from './components/Onboarding/ReviewAndEdit';
 import DocumentCreate from './components/Documents/DocumentCreate';
 import {ApplicationsPage} from './pages/ApplicationsPage';
-import { Dashboard } from './components/Home/Dashboard';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage'
 import ScholarshipDetail  from './pages/ScholarshipDetail';
@@ -205,13 +205,14 @@ function App() {
                 <Route path="/onboarding26" element={<Onboarding26 />} />
                 <Route path="/onboarding27" element={<Onboarding27 />} />
                 <Route path="/review-edit" element={<ReviewAndEdit />} />
-                <Route path="/home" element={<Dashboard />} />
+                <Route path="/home" element={<Root />} />
                 <Route path="/Scholarships" element={<ScholarshipsPage />} />
                 <Route path="/scholarship/:id" element={<ScholarshipDetail />} /> 
                 <Route path="/documents" element={<DocumentPage />} />
                 <Route path="/applications" element={<ApplicationsPage />} />
                 <Route path="/create" element={<DocumentCreate />} />
                 <Route path="*" element={<AllRoutes />} />
+
               </Routes>
             </FormDataProvider>
           )}

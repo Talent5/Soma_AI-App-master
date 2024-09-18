@@ -84,7 +84,7 @@ export const EducationalInfo = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           {/* Current Level of Education */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Current Level of Education</label>
+            <label className="block text-black text-sm font-normal mb-1">Current Level of Education</label>
             <select
               value={userData.currentLevelOfEducation}
               onChange={(e) => handleInputChange('currentLevelOfEducation', e.target.value)}
@@ -101,7 +101,7 @@ export const EducationalInfo = () => {
 
           {/* High School Name */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">High School Name</label>
+            <label className="block text-black text-sm font-normal mb-1">High School Name</label>
             <input
               type="text"
               value={userData.highSchoolName}
@@ -113,7 +113,7 @@ export const EducationalInfo = () => {
 
           {/* University Name (Optional) */}
           <div className="mb-4 ">
-            <label className="block text-black text-xl font-normal mb-1">University Name (Optional)</label>
+            <label className="block text-black text-sm font-normal mb-1">University Name (Optional)</label>
             <input
               type="text"
               value={userData.universityName}
@@ -125,7 +125,7 @@ export const EducationalInfo = () => {
 
           {/* GPA (Optional) */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">GPA (Optional)</label>
+            <label className="block text-black text-sm font-normal mb-1">GPA (Optional)</label>
             <input
               type="number"
               value={userData.gpa}
@@ -140,7 +140,7 @@ export const EducationalInfo = () => {
 
           {/* Expected Graduation Date */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Expected Graduation Date</label>
+            <label className="block text-black text-sm font-normal mb-1">Expected Graduation Date</label>
             <input
               type="date"
               value={userData.expectedGraduationDate}

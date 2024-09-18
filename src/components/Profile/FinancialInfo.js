@@ -84,7 +84,7 @@ const FinancialInfo = () => {
         <form onSubmit={(e) => e.preventDefault()}>
           {/* Household Income Bracket */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Household Income Bracket?</label>
+            <label className="block text-black text-sm font-normal mb-1">Household Income Bracket?</label>
             <select
               value={financialData.householdIncomeBracket}
               onChange={(e) => handleInputChange('householdIncomeBracket', e.target.value)}
@@ -101,7 +101,7 @@ const FinancialInfo = () => {
 
           {/* Financial Need Status */}
           <div className="mb-4">
-            <label className="block text-black text-xl font-normal mb-1">Financial Need Status?</label>
+            <label className="block text-black text-sm font-normal mb-1">Financial Need Status?</label>
             {financialNeedStatuses.map(status => (
               <div key={status} className="flex items-center mb-2">
                 <input

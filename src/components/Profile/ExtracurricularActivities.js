@@ -88,7 +88,7 @@ const ExtracurricularActivities = () => {
             <div className="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="mb-4">
-                        <label className="block text-black text-xl gap-2 font-medium mb-2">Sports (optional)</label>
+                        <label className="block text-black text-sm gap-2 font-medium mb-2">Sports (optional)</label>
                         <div className="flex flex-wrap gap-2 mb-2">
                             {activities.sports.map(sport => (
                                 <span key={sport} className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
@@ -121,7 +121,7 @@ const ExtracurricularActivities = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-black text-xl font-medium mb-2">Clubs (optional)</label>
+                        <label className="block text-black text-sm font-medium mb-2">Clubs (optional)</label>
                         <input
                             type="text"
                             value={activities.clubs}
@@ -132,7 +132,7 @@ const ExtracurricularActivities = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-black text-xl font-medium mb-2">Volunteer experience (optional)</label>
+                        <label className="block text-black text-sm font-medium mb-2">Volunteer experience (optional)</label>
                         <textarea
                             value={activities.volunteerExperience}
                             onChange={(e) => handleInputChange('volunteerExperience', e.target.value)}
@@ -143,7 +143,7 @@ const ExtracurricularActivities = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label className="block text-black text-xl font-medium mb-2">Leadership roles (optional)</label>
+                        <label className="block text-black text-sm font-medium mb-2">Leadership roles (optional)</label>
                         <textarea
                             value={activities.leadershipRoles}
                             onChange={(e) => handleInputChange('leadershipRoles', e.target.value)}
