@@ -27,27 +27,41 @@ const initialFormState = {
   gpa: '',
   educationLevel: '',
   cv: null,
-  userId: localStorage.getItem('userId'),
+  userId: '',  // Set this as an empty string initially
 };
 
 export const FormDataProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
     const storedData = localStorage.getItem('formData');
+    const userId = localStorage.getItem('userId');  // Fetch userId from localStorage
+
     if (storedData) {
       try {
         const parsedData = JSON.parse(storedData);
         return {
           ...initialFormState,
           ...parsedData,
-          userId: localStorage.getItem('userId'),
+          userId: userId || '',  // Use localStorage userId if present
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
-        return initialFormState;
+        return { ...initialFormState, userId: userId || '' };  // Ensure userId is always populated
       }
     }
-    return initialFormState;
+
+    return { ...initialFormState, userId: userId || '' };  // Ensure userId is populated in the initial state
   });
+
+  // Ensure userId is always taken from localStorage
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId && storedUserId !== formData.userId) {
+      setFormData((prevData) => ({
+        ...prevData,
+        userId: storedUserId,
+      }));
+    }
+  }, []);
 
   useEffect(() => {
     const saveData = () => {
@@ -100,7 +114,7 @@ export const FormDataProvider = ({ children }) => {
 
       console.log('Submission successful');
       localStorage.removeItem('formData');
-      setFormData(initialFormState);
+      setFormData({ ...initialFormState, userId: formData.userId }); // Retain userId after submission
 
       return { success: true };
     } catch (error) {
@@ -111,8 +125,8 @@ export const FormDataProvider = ({ children }) => {
 
   const resetFormData = useCallback(() => {
     localStorage.removeItem('formData');
-    setFormData(initialFormState);
-  }, []);
+    setFormData({ ...initialFormState, userId: formData.userId });  // Retain userId on reset
+  }, [formData.userId]);
 
   const contextValue = useMemo(
     () => ({
