@@ -48,7 +48,6 @@ export const Onboarding2 = () => {
 
   const handleLater = () => {
     localStorage.setItem('onboardingSeen', 'true');
-    localStorage.removeItem('userId');
     navigate('/home');
   };
 
