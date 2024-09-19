@@ -27,7 +27,7 @@ const initialFormState = {
   gpa: '',
   educationLevel: '',
   cv: null,
-  userId: localStorage.getItem('userId') || '',
+  userId: localStorage.getItem('userId'),
 };
 
 export const FormDataProvider = ({ children }) => {
@@ -39,7 +39,7 @@ export const FormDataProvider = ({ children }) => {
         return {
           ...initialFormState,
           ...parsedData,
-          userId: localStorage.getItem('userId') || parsedData.userId || '',
+          userId: localStorage.getItem('userId'),
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
