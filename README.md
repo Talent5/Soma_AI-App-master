@@ -68,7 +68,7 @@ For the best experience, we recommend using Soma AI on one of the following web 
 
 ### Dashboard Page
 
-![MainPage] (./assets/Dashboard.png)
+![MainPage](./assets/Dashboard.png)
 - *Description*: Screenshot of the main dashboard, displaying matched scholarships, upcoming deadlines, and progress tracking.
 - *Note*: T
 - **Scholarship Search**: Image showing the scholarship search and filter interface, highlighting the functionality of finding and refining search results.
