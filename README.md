@@ -66,18 +66,6 @@ For the best experience, we recommend using Soma AI on one of the following web 
 ![Personal Information](./assets/form.png)  
 *Description*: Show a screenshot of the form where users enter personal information. This image demonstrates the profile setup process.
 
-### Dashboard Page
-
-![MainPage](./assets/Dashboard.png)
-- *Description*: Screenshot of the main dashboard, displaying matched scholarships, upcoming deadlines, and progress tracking.
-- *Note*: T
-- **Scholarship Search**: Image showing the scholarship search and filter interface, highlighting the functionality of finding and refining search results.
-- **Scholarship Details**: Detailed view of a specific scholarship, including eligibility criteria, amount, and application deadline.
-- **Document Management**: Screenshot of the document management section where users can create, store, and edit scholarship-related documents.
-- **Profile Management**: Image showing the profile management page where users can update their personal and educational information.
-
-> **Tip**: Make sure screenshots are clear, appropriately cropped, and emphasize the user interface design to enhance the visual appeal of the README.
-
 ## Structure
 The repository is structured as follows:
 
@@ -94,7 +82,7 @@ Soma AI leverages advanced AI models hosted on Microsoft Azure for:
 
 ### Main Dashboard
 
-![MainPage] (./assets/Dashboard.png)
+![MainPage](./assets/Dashboard.png)
 After logging in, you'll see a personalized dashboard that includes:
 - Welcome message with your name
 - Number of matched scholarships
@@ -103,17 +91,22 @@ After logging in, you'll see a personalized dashboard that includes:
 - Application progress (in progress and completed)
 
 ### Scholarship Search and Listing
+
+![Scholaship](./assets/scholaships.png)
+The search interface allows users to filter scholarships by criteria such as location, field of study, and award
 - Search bar for finding specific scholarships
 - Filter options to refine search results
 - Scholarship cards showing name, amount, and deadline
 - Detailed information for each scholarship, including eligibility criteria
 
 ### Document Management
+![Documents](./assets/documents.png)
 - Create, store, and manage all scholarship-related documents
 - Search functionality for quick document retrieval
 - AI-powered assistance for drafting and editing essays
 
 ### Profile Management
+![profile](./assets/profile.png)
 The Profile section allows users to manage their personal and academic information, including personal details, educational background, field of study, extracurricular activities, and financial information. Additional account management options include switching or deleting accounts.
 
 ### Navigation
