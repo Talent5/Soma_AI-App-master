@@ -115,7 +115,7 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
           <button
             onClick={handleUpload}
             disabled={!file || uploading}
-            className={`px-4 py-2 rounded text-white ${
+            className={`px-4 py-2 rounded-full text-white ${
               uploading
                 ? 'bg-blue-900 cursor-not-allowed'
                 : 'bg-blue-950 hover:bg-blue-900'
@@ -126,7 +126,7 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
           <button
             onClick={onClose}
             disabled={uploading}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            className="px-4 py-2 bg-gray-300 text-blue-950 rounded-full hover:bg-gray-600"
           >
             Cancel
           </button>

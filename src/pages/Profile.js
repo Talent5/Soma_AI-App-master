@@ -47,7 +47,7 @@ export const Profile = () => {
       </button>
       <button 
         onClick={handleLogout} 
-        className="mt-4 px-4 py-2 bg-transparent border text-blue-950 rounded-full hover:bg-red-600 transition-colors duration-300">
+        className="mt-4 px-4 py-2 bg-gray-300 border text-blue-950 rounded-full hover:bg-red-600 transition-colors duration-300">
         Delete Account
       </button>
     </div>

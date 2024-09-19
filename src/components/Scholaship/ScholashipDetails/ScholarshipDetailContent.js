@@ -233,7 +233,7 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                         <h3 className="text-lg font-semibold mb-4">Have you completed your application?</h3>
                         <div className="flex justify-end space-x-4 gap-2">
                             <button 
-                                className="px-4 py-2 bg-gray-300 rounded-full "
+                                className="px-4 py-2 bg-gray-300 text-blue-950 rounded-full "
                                 onClick={() => setShowConfirmation(false)}
                             >
                                 Not yet
