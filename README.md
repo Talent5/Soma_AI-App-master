@@ -162,7 +162,7 @@ The web application features an intuitive navigation menu for easy access to all
 - Information is used solely for scholarship matching and application assistance.
 
 ## Support
-Feel free to reach out to us at [email@example.com](Talent:talentmundwa5@gmail.com) or join our [community chat](https://discord.gg/YourCommunityLink).
+Feel free to reach out to us at [Talent Mundwa](talentmundwa5@gmail.com).
 
 ## About Us
 we are African students who have a mission to make a change when it comes to look for scholaships
