@@ -229,7 +229,7 @@ const ScholarshipDetailContent = ({ scholarship }) => {
 
             {showConfirmation && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg">
+                    <div className="bg-white mb-2 p-6 rounded-lg">
                         <h3 className="text-lg font-semibold mb-4">Have you completed your application?</h3>
                         <div className="flex justify-end space-x-4 gap-2">
                             <button 
@@ -239,7 +239,7 @@ const ScholarshipDetailContent = ({ scholarship }) => {
                                 Not yet
                             </button>
                             <button 
-                                className="px-4 py-2 bg-green-500 text-white rounded-full"
+                                className="px-4 py-2 bg-blue-950 text-white rounded-full"
                                 onClick={handleConfirmSubmission}
                             >
                                 Yes, I've submitted

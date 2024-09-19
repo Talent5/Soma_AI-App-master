@@ -111,14 +111,14 @@ const DocumentUpload = ({ onClose, onDocumentAdded }) => {
         {error && <p className="text-sm text-red-500 mb-3">{error}</p>}
         {successMessage && <p className="text-sm text-green-500 mb-3">{successMessage}</p>}
 
-        <div className="mt-4 flex justify-end space-x-3">
+        <div className="mt-4 gap-2 mb-2 flex justify-end space-x-3">
           <button
             onClick={handleUpload}
             disabled={!file || uploading}
             className={`px-4 py-2 rounded text-white ${
               uploading
-                ? 'bg-blue-400 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-blue-900 cursor-not-allowed'
+                : 'bg-blue-950 hover:bg-blue-900'
             }`}
           >
             {uploading ? 'Uploading...' : 'Upload'}
