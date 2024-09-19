@@ -66,8 +66,11 @@ For the best experience, we recommend using Soma AI on one of the following web 
 ![Personal Information](./assets/form.png)  
 *Description*: Show a screenshot of the form where users enter personal information. This image demonstrates the profile setup process.
 
-### Placeholder for Additional Screenshots
-- **Dashboard**: Screenshot of the main dashboard, displaying matched scholarships, upcoming deadlines, and progress tracking.
+### Dashboard Page
+
+![MainPage] (./assets/Dashboard.png)
+- *Description*: Screenshot of the main dashboard, displaying matched scholarships, upcoming deadlines, and progress tracking.
+- *Note*: T
 - **Scholarship Search**: Image showing the scholarship search and filter interface, highlighting the functionality of finding and refining search results.
 - **Scholarship Details**: Detailed view of a specific scholarship, including eligibility criteria, amount, and application deadline.
 - **Document Management**: Screenshot of the document management section where users can create, store, and edit scholarship-related documents.
@@ -90,6 +93,8 @@ Soma AI leverages advanced AI models hosted on Microsoft Azure for:
 ## How It Works
 
 ### Main Dashboard
+
+![MainPage] (./assets/Dashboard.png)
 After logging in, you'll see a personalized dashboard that includes:
 - Welcome message with your name
 - Number of matched scholarships
