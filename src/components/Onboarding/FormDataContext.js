@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../config/firebase';
 import { doc, setDoc } from 'firebase/firestore';
