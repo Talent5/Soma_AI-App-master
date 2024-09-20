@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-export const SearchFilters = ({ searchValue, setSearchValue, filter, setFilter }) => {
+export const SearchFilters = ({ searchValue, setSearchValue, openFilterModal }) => {
   return (
     <header className="bg-transparent mb-4">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Scholarships</h1>
@@ -21,15 +21,12 @@ export const SearchFilters = ({ searchValue, setSearchValue, filter, setFilter }
         <div className="flex space-x-4">
           <span
             className="p-2 rounded-full border-0 cursor-pointer hover:bg-gray-100"
-            onClick={() => setFilter('filter1')} // Example filter logic
+            onClick={openFilterModal}  // Call openFilterModal when clicked
           >
-            <i className="bi bi-filter-left text-gray-600"></i>
+            <i className="bi bi-sort-down text-gray-600"></i>
           </span>
-          <span
-            className="p-2 rounded-full border-0 cursor-pointer hover:bg-gray-100"
-            onClick={() => setFilter('funnel')}
-          >
-            <i className="bi bi-funnel text-gray-600"></i>
+          <span className="p-2 rounded-full border-0 cursor-pointer hover:bg-gray-100">
+            <i className="bi bi-filter-left text-gray-600"></i>
           </span>
         </div>
       </div>
@@ -40,8 +37,9 @@ export const SearchFilters = ({ searchValue, setSearchValue, filter, setFilter }
 SearchFilters.propTypes = {
   searchValue: PropTypes.string.isRequired,
   setSearchValue: PropTypes.func.isRequired,
-  filter: PropTypes.string.isRequired,
-  setFilter: PropTypes.func.isRequired,
+  openFilterModal: PropTypes.func.isRequired, // Marked as required
 };
+
+
 
 

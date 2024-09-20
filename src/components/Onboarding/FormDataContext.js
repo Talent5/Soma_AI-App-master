@@ -27,6 +27,7 @@ const initialFormState = {
   highSchoolName: '',
   gpa: '',
   educationLevel: '',
+  preferredLocation: '',
   cv: null,
 };
 

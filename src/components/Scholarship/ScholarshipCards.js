@@ -9,7 +9,7 @@ const ScholarshipCards = ({ scholarships }) => {
       {scholarships.map((scholarship) => (
         <ScholarshipItem
           key={scholarship.id}
-          id={scholarship.id} // Pass the id prop
+          id={scholarship.id}
           logo={scholarship.logo || placeholderImage}
           title={scholarship.title}
           amount={scholarship.amount}
