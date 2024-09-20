@@ -2,9 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../components/config/firebase';
-import ScholarshipCard from '../components/Scholaship/ScholashipDetails/ScholarshipCard';
-import ErrorDisplay from '../components/Scholaship/ScholashipDetails/ErrorDisplay';
-import LoadingDisplay from '../components/Scholaship/ScholashipDetails/LoadingDisplay';
+import ScholarshipCard from '../components/Scholarship/ScholashipDetails/ScholarshipCard';
+import ErrorDisplay from '../components/Scholarship/ScholashipDetails/ErrorDisplay';
+import LoadingDisplay from '../components/Scholarship/ScholashipDetails/LoadingDisplay';
 
 const ScholarshipDetail = () => {
   const { id } = useParams();
