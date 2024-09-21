@@ -1,26 +1,30 @@
-import React, { useState, useEffect, useCallback } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { SearchFilters } from '../components/Scholarship/SearchFilters';
 import ScholarshipCards from '../components/Scholarship/ScholarshipCards';
 import { NavBar } from '../components/NavBar';
-import { db } from '../components/config/firebase'; // Import your Firebase configuration
+import { db } from '../components/config/firebase';
 import { getDoc, doc } from 'firebase/firestore';
 
 export const ScholarshipsPage = () => {
   const [searchValue, setSearchValue] = useState('');
-  const [filter, setFilter] = useState('');
   const [scholarships, setScholarships] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // Modal state
-  const [sortOption, setSortOption] = useState(''); // Sorting option state
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [sortOptions, setSortOptions] = useState({
+    deadline: '',
+    amount: '',
+    name: ''
+  });
 
   const openFilterModal = () => {
-    setIsFilterModalOpen(true); // Open modal
+    setIsFilterModalOpen(true);
   };
 
   const closeFilterModal = () => {
-    setIsFilterModalOpen(false); // Close modal
+    setIsFilterModalOpen(false);
   };
 
   const fetchScholarships = useCallback(async () => {
@@ -43,7 +47,7 @@ export const ScholarshipsPage = () => {
       }
 
       const data = docSnap.data();
-      const scholarships = data.recommendations || []; // Access the 'recommendations' field in the document
+      const scholarships = data.recommendations || [];
       
       setScholarships(scholarships);
     } catch (error) {
@@ -70,23 +74,54 @@ export const ScholarshipsPage = () => {
     }
   }, [fetchScholarships, userId]);
 
-  // Sort scholarships based on the selected sorting option
-  const sortedScholarships = scholarships.slice().sort((a, b) => {
-    if (sortOption === 'soonest') {
-      return new Date(a.deadline) - new Date(b.deadline);
-    } else if (sortOption === 'latest') {
-      return new Date(b.deadline) - new Date(a.deadline);
-    } else if (sortOption === 'highest') {
-      return b.amount - a.amount;
-    } else if (sortOption === 'lowest') {
-      return a.amount - b.amount;
-    } else if (sortOption === 'a-z') {
-      return a.title.localeCompare(b.title);
-    } else if (sortOption === 'z-a') {
-      return b.title.localeCompare(a.title);
+  const handleSortOptionChange = (category, value) => {
+    setSortOptions(prevOptions => ({
+      ...prevOptions,
+      [category]: value
+    }));
+  };
+
+  const sortScholarships = (scholarships) => {
+    return scholarships.slice().sort((a, b) => {
+      if (sortOptions.deadline) {
+        const dateComparison = sortOptions.deadline === 'soonest'
+          ? new Date(a.deadline) - new Date(b.deadline)
+          : new Date(b.deadline) - new Date(a.deadline);
+        if (dateComparison !== 0) return dateComparison;
+      }
+
+      if (sortOptions.amount) {
+        const amountComparison = sortOptions.amount === 'highest'
+          ? b.amount - a.amount
+          : a.amount - b.amount;
+        if (amountComparison !== 0) return amountComparison;
+      }
+
+      if (sortOptions.name) {
+        return sortOptions.name === 'a-z'
+          ? a.title.localeCompare(b.title)
+          : b.title.localeCompare(a.title);
+      }
+
+      return 0;
+    });
+  };
+
+  const filteredAndSortedScholarships = useMemo(() => {
+    let result = scholarships;
+
+    // Apply search filter
+    if (searchValue.trim() !== '') {
+      const searchLower = searchValue.toLowerCase();
+      result = result.filter(scholarship => 
+        scholarship.title.toLowerCase().includes(searchLower) ||
+        scholarship.description.toLowerCase().includes(searchLower)
+      );
     }
-    return 0; // No sorting if no option is selected
-  });
+
+    // Apply sorting
+    return sortScholarships(result);
+  }, [scholarships, searchValue, sortOptions]);
 
   const handleRetry = () => {
     fetchScholarships();
@@ -97,9 +132,7 @@ export const ScholarshipsPage = () => {
       <SearchFilters
         searchValue={searchValue}
         setSearchValue={setSearchValue}
-        filter={filter}
-        setFilter={setFilter}
-        openFilterModal={openFilterModal}  // Pass the function as a prop
+        openFilterModal={openFilterModal}
       />
 
       <div className="flex-1 overflow-y-auto mt-4 p-4 bg-white shadow rounded-lg">
@@ -124,29 +157,25 @@ export const ScholarshipsPage = () => {
             </p>
           </div>
         )}
-        {!isLoading && !error && sortedScholarships.length === 0 && (
+        {!isLoading && !error && filteredAndSortedScholarships.length === 0 && (
           <p>No scholarships found. Try adjusting your search.</p>
         )}
-        {!isLoading && !error && <ScholarshipCards scholarships={sortedScholarships} />}
+        {!isLoading && !error && <ScholarshipCards scholarships={filteredAndSortedScholarships} />}
       </div>
 
-      {/* Modal with filter and sorting options */}
       {isFilterModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Sort scholarships</h2>
-              <button
-                onClick={closeFilterModal}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-                style={{ marginLeft: 'auto' }} // Ensure it stays on the right
-              >
-                &times;
-              </button>
-            </div>
-
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex flex-col z-50">
+          <nav className="bg-white p-4 flex justify-between items-center">
+            <h2 className="text-xl font-bold">Sort scholarships</h2>
+            <button
+              onClick={closeFilterModal}
+              className="text-gray-500 hover:text-gray-700 text-2xl"
+            >
+              &times;
+            </button>
+          </nav>
+          <div className="flex-grow overflow-y-auto bg-white p-6">
             <p className="text-gray-600 mb-4">Use the options below to sort scholarships</p>
-
             <form className="space-y-6">
               <div>
                 <p className="font-medium mb-2">Application deadline</p>
@@ -156,8 +185,8 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-deadline"
                       value="soonest"
-                      checked={sortOption === 'soonest'}
-                      onChange={() => setSortOption('soonest')}
+                      checked={sortOptions.deadline === 'soonest'}
+                      onChange={() => handleSortOptionChange('deadline', 'soonest')}
                       className="mr-2"
                     />
                     Soonest
@@ -167,15 +196,25 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-deadline"
                       value="latest"
-                      checked={sortOption === 'latest'}
-                      onChange={() => setSortOption('latest')}
+                      checked={sortOptions.deadline === 'latest'}
+                      onChange={() => handleSortOptionChange('deadline', 'latest')}
                       className="mr-2"
                     />
                     Latest
                   </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="sort-deadline"
+                      value=""
+                      checked={sortOptions.deadline === ''}
+                      onChange={() => handleSortOptionChange('deadline', '')}
+                      className="mr-2"
+                    />
+                    No preference
+                  </label>
                 </div>
               </div>
-
               <div>
                 <p className="font-medium mb-2">Amount</p>
                 <div className="space-y-2">
@@ -184,8 +223,8 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-amount"
                       value="highest"
-                      checked={sortOption === 'highest'}
-                      onChange={() => setSortOption('highest')}
+                      checked={sortOptions.amount === 'highest'}
+                      onChange={() => handleSortOptionChange('amount', 'highest')}
                       className="mr-2"
                     />
                     Highest
@@ -195,15 +234,25 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-amount"
                       value="lowest"
-                      checked={sortOption === 'lowest'}
-                      onChange={() => setSortOption('lowest')}
+                      checked={sortOptions.amount === 'lowest'}
+                      onChange={() => handleSortOptionChange('amount', 'lowest')}
                       className="mr-2"
                     />
                     Lowest
                   </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="sort-amount"
+                      value=""
+                      checked={sortOptions.amount === ''}
+                      onChange={() => handleSortOptionChange('amount', '')}
+                      className="mr-2"
+                    />
+                    No preference
+                  </label>
                 </div>
               </div>
-
               <div>
                 <p className="font-medium mb-2">Scholarship name</p>
                 <div className="space-y-2">
@@ -212,8 +261,8 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-name"
                       value="a-z"
-                      checked={sortOption === 'a-z'}
-                      onChange={() => setSortOption('a-z')}
+                      checked={sortOptions.name === 'a-z'}
+                      onChange={() => handleSortOptionChange('name', 'a-z')}
                       className="mr-2"
                     />
                     A - Z
@@ -223,11 +272,22 @@ export const ScholarshipsPage = () => {
                       type="radio"
                       name="sort-name"
                       value="z-a"
-                      checked={sortOption === 'z-a'}
-                      onChange={() => setSortOption('z-a')}
+                      checked={sortOptions.name === 'z-a'}
+                      onChange={() => handleSortOptionChange('name', 'z-a')}
                       className="mr-2"
                     />
                     Z - A
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="sort-name"
+                      value=""
+                      checked={sortOptions.name === ''}
+                      onChange={() => handleSortOptionChange('name', '')}
+                      className="mr-2"
+                    />
+                    No preference
                   </label>
                 </div>
               </div>
