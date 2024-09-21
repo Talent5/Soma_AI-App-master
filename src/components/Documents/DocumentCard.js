@@ -101,8 +101,8 @@ const DocumentCard = ({ document, isMenuVisible, onMenuToggle }) => {
             <div className="modal-body">
               <p>Are you sure you want to delete the document titled "{document.title || document.name}"?</p>
             </div>
-            <div className="modal-footer">
-              <button className="modal-button modal-confirm" onClick={confirmDelete}>Confirm</button>
+            <div className="modal-footer flex flex-col gap-2">
+              <button className="modal-button modal-confirm rounded-full bg-blue-950" onClick={confirmDelete}>Confirm</button>
               <button className="modal-button modal-cancel" onClick={cancelDelete}>Cancel</button>
             </div>
           </div>

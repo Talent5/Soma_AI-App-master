@@ -3,11 +3,14 @@ import { setDoc, doc, getDoc } from 'firebase/firestore';
 import PropTypes from 'prop-types';
 import { db } from '../config/firebase';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { Editor } from '@tinymce/tinymce-react';
 import { Bot, ArrowLeft, Save } from 'lucide-react';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AUTO_SAVE_INTERVAL = 10000; // 10 seconds
+
+// Initialize the Google Generative AI with your API key
+const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
 
 const DocumentCreate = ({ documentId }) => {
   const [documentTitle, setDocumentTitle] = useState('Untitled document');
@@ -15,6 +18,7 @@ const DocumentCreate = ({ documentId }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [documentUrl, setDocumentUrl] = useState('');
   const [isDirty, setIsDirty] = useState(false);
+  const [promptInput, setPromptInput] = useState('');
   const editorRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
   const navigate = useNavigate();
@@ -57,11 +61,14 @@ const DocumentCreate = ({ documentId }) => {
 
     setIsSaving(true);
     try {
+      // Format the title - **Complete this formatting**
+      const formattedTitle = `<p>${documentTitle.trim()}</p><p>Your </p>`; 
+
       const documentRef = doc(db, 'documents', documentId || new Date().toISOString());
-      const downloadUrl = documentUrl || `https://your-storage-url.com/${documentId}`;
+      const downloadUrl = documentUrl || `https://your-storage-url.com/${documentId}`; // **Replace placeholder!**
 
       await setDoc(documentRef, {
-        title: documentTitle.trim(),
+        title: formattedTitle, // Save the formatted title
         content: documentContent.trim(),
         updatedAt: new Date(),
         userId: localStorage.getItem('userId'),
@@ -97,9 +104,13 @@ const DocumentCreate = ({ documentId }) => {
     setDocumentContent(content);
     setIsDirty(true);
     debouncedAutoSave();
+
+    // Automatically set the document title based on the first sentence or first word
+    const firstWord = content.split(/\s+/).slice(0, 3).join(' ');
+    setDocumentTitle(firstWord || 'Untitled document');
   };
 
-  // Handle title change and trigger auto-save
+  // Handle title change manually if needed
   const handleTitleChange = (e) => {
     setDocumentTitle(e.target.value);
     setIsDirty(true);
@@ -108,43 +119,54 @@ const DocumentCreate = ({ documentId }) => {
 
   // AI Content Generation using Gemini API
   const handleAIPrompt = async () => {
-    const userPrompt = prompt('Enter a prompt for AI to generate content:');
-    if (userPrompt && editorRef.current) {
+    if (promptInput && editorRef.current) {
       try {
-        setIsSaving(true); // Show loading state
+        setIsSaving(true);
 
-        const response = await axios.post(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
-          {
-            contents: [{ parts: [{ text: userPrompt }] }]
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${process.env.REACT_APP_GEMINI_API_KEY}`
-            }
-          }
-        );
+        // Generate AI content
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const result = await model.generateContent(promptInput);
+        const response = await result.response;
+        const aiContent = response.text();
 
-        const aiContent = response.data.candidates[0].content.parts[0].text;
-        editorRef.current.setContent(aiContent);
+        // Automatically format the document
+        const formattedContent = formatContent(aiContent);
+
+        // Set the formatted AI content in the editor
+        editorRef.current.setContent(formattedContent);
         setIsDirty(true);
       } catch (error) {
         console.error('Error generating AI content:', error);
-        alert('Failed to generate AI content.');
+        if (error.message.includes('RECITATION')) {
+          alert('AI response was blocked due to content policy. Please try a different prompt.');
+        } else {
+          alert('Failed to generate AI content. Please try again later.');
+        }
       } finally {
-        setIsSaving(false); // Hide loading state
+        setIsSaving(false);
       }
     }
   };
 
-  // Handle navigation back with unsaved changes check
+  // Format AI content with headings, links, and paragraphs
+  const formatContent = (content) => {
+    const lines = content.split('\n');
+    const formattedLines = lines.map((line) => {
+      if (line.startsWith('* ')) {
+        return `<strong>${line.substring(2)}</strong><br />`;
+      }
+      return `<p>${line}</p>`;
+    });
+    return formattedLines.join('');
+  };
+
+  // Handle navigation back without auto-saving
   const handleBackButtonClick = () => {
     if (isDirty) {
       const confirmDiscard = window.confirm('You have unsaved changes. Do you want to leave without saving?');
       if (!confirmDiscard) return;
     }
-    navigate('/documents');
+    navigate('/documents'); 
   };
 
   return (
@@ -165,8 +187,16 @@ const DocumentCreate = ({ documentId }) => {
         </button>
       </div>
 
-      <Editor
-        apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
+      <input
+        type="text"
+        placeholder="Enter your prompt here..."
+        value={promptInput}
+        onChange={(e) => setPromptInput(e.target.value)}
+        className="p-2 border mb-4"
+      />
+
+      <Editor 
+        apiKey={process.env.REACT_APP_TINYMCE_API_KEY} 
         onInit={(evt, editor) => editorRef.current = editor}
         value={documentContent}
         onEditorChange={handleEditorChange}
@@ -185,7 +215,7 @@ const DocumentCreate = ({ documentId }) => {
           mobile: {
             theme: 'mobile',
             plugins: ['autosave', 'lists', 'autolink'],
-            toolbar: ['undo', 'bold', 'italic', 'styleselect']
+            toolbar: ['undo', 'bold', 'italic', 'styleselect'] 
           }
         }}
       />
