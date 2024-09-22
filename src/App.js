@@ -50,7 +50,7 @@ import {ApplicationsPage} from './pages/ApplicationsPage';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage'
 import ScholarshipDetail  from './pages/ScholarshipDetail';
-// import MobileCheckMessage from './MobileCheckMessage';
+import MobileCheckMessage from './MobileCheckMessage';
 import { DocumentPage } from './pages/DocumentPage';
 import AllRoutes from './routes/AllRoutes';
 import './global.css';
@@ -63,13 +63,13 @@ function RouteEffects() {
   const pathname = location.pathname;
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-  //   if (!isMobile) {
-  //     // Redirect non-mobile users
-  //     navigate('/not-supported');
-  //   }
-  // }, [navigate]);
+  useEffect(() => {
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    if (!isMobile) {
+      // Redirect non-mobile users
+      navigate('/not-supported');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (action !== 'POP') {
@@ -167,7 +167,7 @@ function App() {
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <AudioProvider>
         <ProgressProvider>
-          {/* <MobileCheckMessage /> */}
+          <MobileCheckMessage />
           {showSplash ? (
             <SplashScreen />
           ) : (
