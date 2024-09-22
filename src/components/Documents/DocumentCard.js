@@ -103,7 +103,7 @@ const DocumentCard = ({ document, isMenuVisible, onMenuToggle }) => {
             </div>
             <div className="modal-footer flex flex-col gap-2">
               <button className="modal-button modal-confirm rounded-full bg-blue-950" onClick={confirmDelete}>Confirm</button>
-              <button className="modal-button modal-cancel" onClick={cancelDelete}>Cancel</button>
+              <button className="modal-button modal-cancel bg-gray-300 rounded-full" onClick={cancelDelete}>Cancel</button>
             </div>
           </div>
         </div>
