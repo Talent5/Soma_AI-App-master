@@ -34,7 +34,7 @@ export const Onboarding1 = () => {
   };
 
   return (
-    <section className="text-center mt-4">
+    <section className="text-center mx-2 mt-4">
       {error && <p className="text-red-500 mb-4">{error}</p>}
       
       {isLoading ? (
