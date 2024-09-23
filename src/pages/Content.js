@@ -7,7 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export const Content = () => {
   return (
-    <div className="bg-gradient-to-b from-pink-100 to-pink-300 min-h-screen flex flex-col items-center justify-center p-4">
+    <div className="bg-gradient-to-b from-pink-100 to-pink-300 min-h-screen flex flex-col items-center justify-center p-4 ">
       <Header />
       <WelcomeCard />
       <Onboarding1 />

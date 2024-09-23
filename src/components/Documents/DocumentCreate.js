@@ -2,14 +2,15 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { setDoc, doc, getDoc, collection, addDoc, getDocs } from 'firebase/firestore';
 import PropTypes from 'prop-types';
-import { db } from '../config/firebase';
+import { db } from '../config/firebase'; // Update with your actual Firebase config import
 import { useNavigate } from 'react-router-dom';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Bot, ArrowLeft, Save, Menu, History, Undo, Redo, X } from 'lucide-react';
+import DOMPurify from 'dompurify'; 
 
-const AUTO_SAVE_INTERVAL = 10000; // 10 seconds
+const AUTO_SAVE_INTERVAL = 10000; 
 const WORD_COUNT_LIMIT = 5000;
 
 const genAI = new GoogleGenerativeAI(process.env.REACT_APP_GEMINI_API_KEY);
@@ -19,7 +20,7 @@ const DocumentCreate = ({ documentId }) => {
   const [documentContent, setDocumentContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [documentUrl, setDocumentUrl] = useState('');
-  const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(false); 
   const [promptInput, setPromptInput] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAIDrawerOpen, setIsAIDrawerOpen] = useState(false);
@@ -30,7 +31,7 @@ const DocumentCreate = ({ documentId }) => {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const quillRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -38,12 +39,13 @@ const DocumentCreate = ({ documentId }) => {
         try {
           const docRef = doc(db, 'documents', documentId);
           const docSnap = await getDoc(docRef);
+
           if (docSnap.exists()) {
             const data = docSnap.data();
             setDocumentTitle(data.title);
-            setDocumentContent(data.content);
+            setDocumentContent(DOMPurify.sanitize(data.content)); 
             setDocumentUrl(data.url || '');
-            setWordCount(countWords(data.content));
+            setWordCount(countWords(data.content)); 
           }
         } catch (error) {
           console.error('Error fetching document:', error);
@@ -68,25 +70,25 @@ const DocumentCreate = ({ documentId }) => {
     }
 
     setIsSaving(true);
+
     try {
       const documentRef = doc(db, 'documents', documentId || new Date().toISOString());
-      const downloadUrl = documentUrl || `https://your-storage-url.com/${documentId}`; // Update with your actual storage URL
+      const downloadUrl = documentUrl || `https://your-storage-url.com/${documentId}`; 
 
       await setDoc(documentRef, {
         title: documentTitle.trim(),
-        content: documentContent.trim(),
+        content: documentContent.trim(), 
         updatedAt: new Date(),
-        userId: localStorage.getItem('userId'),
-        url: downloadUrl,
+        userId: localStorage.getItem('userId'), 
+        url: downloadUrl, 
       });
 
-      // Add to document history
       await addDoc(collection(db, 'documents', documentRef.id, 'history'), {
         content: documentContent.trim(),
         timestamp: new Date(),
       });
 
-      setDocumentUrl(downloadUrl);
+      setDocumentUrl(downloadUrl); 
       setIsDirty(false);
 
       if (!autoSave) {
@@ -102,6 +104,7 @@ const DocumentCreate = ({ documentId }) => {
     }
   }, [documentTitle, documentContent, documentId, documentUrl]);
 
+
   const debouncedAutoSave = useCallback(() => {
     if (autoSaveTimeoutRef.current) {
       clearTimeout(autoSaveTimeoutRef.current);
@@ -113,8 +116,8 @@ const DocumentCreate = ({ documentId }) => {
 
   const handleEditorChange = (content) => {
     setDocumentContent(content);
-    setIsDirty(true);
-    debouncedAutoSave();
+    setIsDirty(true); 
+    debouncedAutoSave(); 
     setWordCount(countWords(content));
   };
 
@@ -127,20 +130,23 @@ const DocumentCreate = ({ documentId }) => {
   const handleAIPrompt = async () => {
     if (promptInput && quillRef.current) {
       try {
-        setIsGeneratingAI(true);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        setIsGeneratingAI(true); 
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" }); 
         const result = await model.generateContent(promptInput);
         const aiContent = result.response.text();
-        const formattedContent = formatContent(aiContent);
+
+        const formattedAIcontent = formatContent(aiContent);
+
         const editor = quillRef.current.getEditor();
         const range = editor.getSelection();
-        editor.insertText(range ? range.index : 0, formattedContent);
+        editor.clipboard.dangerouslyPasteHTML(range ? range.index : 0, formattedAIcontent);
+
         setIsDirty(true);
-        setIsAIDrawerOpen(false);
+        setIsAIDrawerOpen(false); 
         alert("AI-generated content has been added to your document.");
       } catch (error) {
         console.error('Error generating AI content:', error);
-        alert("Failed to generate AI content. Please try again.");
+        alert("Failed to generate AI content. Please try again."); 
       } finally {
         setIsGeneratingAI(false);
       }
@@ -151,7 +157,7 @@ const DocumentCreate = ({ documentId }) => {
     if (isDirty) {
       setIsExitDialogOpen(true);
     } else {
-      navigate('/documents');
+      navigate('/documents'); 
     }
   };
 
@@ -167,15 +173,16 @@ const DocumentCreate = ({ documentId }) => {
         setDocumentHistory(history);
       } catch (error) {
         console.error('Error fetching document history:', error);
-        alert("Failed to load document history.");
+        alert("Failed to load document history."); 
       }
     }
   };
 
   const restoreVersion = (version) => {
     if (quillRef.current) {
+      const sanitizedContent = DOMPurify.sanitize(version.content);
       const editor = quillRef.current.getEditor();
-      editor.setContents(editor.clipboard.convert(version.content));
+      editor.setContents(editor.clipboard.convert(sanitizedContent));
       setIsDirty(true);
       setIsHistoryDialogOpen(false);
       alert("The selected version has been restored.");
@@ -187,39 +194,37 @@ const DocumentCreate = ({ documentId }) => {
   };
 
   const formatContent = (content) => {
-    return content.split('\n').map(line => `<p>${line}</p>`).join('');
+    return content.split('\n').map(line => `<p>${line.trim()}</p>`).join('');
   };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-    setIsAIDrawerOpen(false); // Close AI drawer if open
+    setIsAIDrawerOpen(false); 
   };
 
   const toggleAIDrawer = () => {
     setIsAIDrawerOpen(!isAIDrawerOpen);
-    setIsMenuOpen(false); // Close menu if open
+    setIsMenuOpen(false); 
   };
 
   const modules = {
     toolbar: [
-      [{ 'header': [1, 2, false] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }], 
       ['bold', 'italic', 'underline', 'strike', 'blockquote'],
       [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
       ['link', 'image'],
-      ['clean']
+      ['clean'] 
     ],
   };
 
   const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
-    'link', 'image'
+    'header', 'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent', 'link', 'image'
   ];
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: 'white' }}>
-      {!isMenuOpen && !isAIDrawerOpen && ( 
+      {!isMenuOpen && !isAIDrawerOpen && (
         <header style={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -275,10 +280,11 @@ const DocumentCreate = ({ documentId }) => {
           modules={modules}
           formats={formats}
           style={{ height: '100%' }}
-        />
+        >
+          <p></p> 
+        </ReactQuill>
       </main>
 
-      {/* Footer */}
       {!isMenuOpen && !isAIDrawerOpen && (
         <footer style={{ padding: '0.5rem', borderTop: '1px solid #ccc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>Words: {wordCount}/{WORD_COUNT_LIMIT}</span>
@@ -288,7 +294,6 @@ const DocumentCreate = ({ documentId }) => {
         </footer>
       )}
 
-      {/* AI Button */}
       {!isMenuOpen && !isAIDrawerOpen && (
         <button
           onClick={toggleAIDrawer}
@@ -309,10 +314,9 @@ const DocumentCreate = ({ documentId }) => {
         </button>
       )}
 
-      {/* Menu */}
       {isMenuOpen && (
-        <div className='gap-2' style={{ 
-          position: '', 
+        <div style={{ 
+          position: 'fixed', 
           top: 0,  
           bottom: 0, 
           width: '80%', 
@@ -321,8 +325,10 @@ const DocumentCreate = ({ documentId }) => {
           padding: '1rem', 
           zIndex: 10, 
         }}>
-          <span onClick={toggleMenu} className='top-2 text-left text-xl cursor-pointer'>X</span>
-          <button onClick={handleBackButtonClick} className='' style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <button onClick={toggleMenu} style={{ display: 'block', textAlign: 'left', marginBottom: '1rem' }}>
+            <X size={24} />
+          </button>
+          <button onClick={handleBackButtonClick} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <ArrowLeft size={18} style={{ marginRight: '0.5rem' }} /> Back to Documents
           </button>
           <button onClick={() => quillRef.current?.getEditor().history.undo()} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -331,16 +337,24 @@ const DocumentCreate = ({ documentId }) => {
           <button onClick={() => quillRef.current?.getEditor().history.redo()} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <Redo size={18} style={{ marginRight: '0.5rem' }} /> Redo
           </button>
-          {/* ... Add other menu items as needed ... */}
+          {/* ... Add other menu items here ... */}
         </div>
       )}
 
-      {/* AI Drawer */}
       {isAIDrawerOpen && (
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'white', padding: '1rem', zIndex: 10 }}>
+        <div style={{ 
+          position: 'absolute', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          background: 'white', 
+          padding: '1rem', 
+          zIndex: 10 
+        }}>
           <button onClick={toggleAIDrawer} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem' }}>
             <X size={24} />
           </button>
+
           <h2 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>AI Assistant</h2>
           <input
             type="text"
@@ -350,12 +364,11 @@ const DocumentCreate = ({ documentId }) => {
             style={{ width: '100%', marginBottom: '0.5rem', padding: '0.5rem' }}
           />
           <button onClick={handleAIPrompt} disabled={isGeneratingAI} style={{ width: '100%', padding: '0.5rem' }}>
-            {isGeneratingAI ? 'Generating...' : 'Generate Content'}
+            {isGeneratingAI ? 'Generating...' : 'Generate Content'} 
           </button>
         </div>
       )}
 
-      {/* History Dialog */}
       {isHistoryDialogOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: 'white', padding: '1rem', borderRadius: '0.5rem', maxWidth: '90%', maxHeight: '90%', overflow: 'auto' }}>
@@ -371,7 +384,6 @@ const DocumentCreate = ({ documentId }) => {
         </div>
       )}
 
-      {/* Exit Dialog */}
       {isExitDialogOpen && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: 'white', padding: '1rem', borderRadius: '0.5rem' }}>
@@ -388,8 +400,9 @@ const DocumentCreate = ({ documentId }) => {
   );
 };
 
+
 DocumentCreate.propTypes = {
-  documentId: PropTypes.string,
+  documentId: PropTypes.string, 
 };
 
 export default DocumentCreate;
