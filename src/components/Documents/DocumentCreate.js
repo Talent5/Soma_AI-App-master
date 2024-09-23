@@ -4,7 +4,8 @@ import { setDoc, doc, getDoc, collection, addDoc, getDocs } from 'firebase/fires
 import PropTypes from 'prop-types';
 import { db } from '../config/firebase';
 import { useNavigate } from 'react-router-dom';
-import { Editor } from '@tinymce/tinymce-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Bot, ArrowLeft, Save, Menu, History, Undo, Redo, X } from 'lucide-react';
 
@@ -27,7 +28,7 @@ const DocumentCreate = ({ documentId }) => {
   const [wordCount, setWordCount] = useState(0);
   const [isExitDialogOpen, setIsExitDialogOpen] = useState(false);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const editorRef = useRef(null);
+  const quillRef = useRef(null);
   const autoSaveTimeoutRef = useRef(null);
   const navigate = useNavigate();
 
@@ -124,14 +125,16 @@ const DocumentCreate = ({ documentId }) => {
   };
 
   const handleAIPrompt = async () => {
-    if (promptInput && editorRef.current) {
+    if (promptInput && quillRef.current) {
       try {
         setIsGeneratingAI(true);
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         const result = await model.generateContent(promptInput);
         const aiContent = result.response.text();
         const formattedContent = formatContent(aiContent);
-        editorRef.current.setContent(formattedContent);
+        const editor = quillRef.current.getEditor();
+        const range = editor.getSelection();
+        editor.insertText(range ? range.index : 0, formattedContent);
         setIsDirty(true);
         setIsAIDrawerOpen(false);
         alert("AI-generated content has been added to your document.");
@@ -170,8 +173,9 @@ const DocumentCreate = ({ documentId }) => {
   };
 
   const restoreVersion = (version) => {
-    if (editorRef.current) {
-      editorRef.current.setContent(version.content);
+    if (quillRef.current) {
+      const editor = quillRef.current.getEditor();
+      editor.setContents(editor.clipboard.convert(version.content));
       setIsDirty(true);
       setIsHistoryDialogOpen(false);
       alert("The selected version has been restored.");
@@ -179,18 +183,11 @@ const DocumentCreate = ({ documentId }) => {
   };
 
   const countWords = (content) => {
-    return content.trim().split(/\s+/).length;
+    return content.trim().replace(/<[^>]*>/g, '').split(/\s+/).length;
   };
 
   const formatContent = (content) => {
-    const lines = content.split('\n');
-    const formattedLines = lines.map((line) => {
-      if (line.startsWith('* ')) {
-        return `<li>${line.substring(2)}</li>`;
-      }
-      return `<p>${line}</p>`;
-    });
-    return `<ul>${formattedLines.join('')}</ul>`; 
+    return content.split('\n').map(line => `<p>${line}</p>`).join('');
   };
 
   const toggleMenu = () => {
@@ -202,6 +199,23 @@ const DocumentCreate = ({ documentId }) => {
     setIsAIDrawerOpen(!isAIDrawerOpen);
     setIsMenuOpen(false); // Close menu if open
   };
+
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const formats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image'
+  ];
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: 'white' }}>
@@ -254,30 +268,13 @@ const DocumentCreate = ({ documentId }) => {
         paddingTop: isMenuOpen || isAIDrawerOpen ? '0' : '0.5rem',
         paddingBottom: isMenuOpen || isAIDrawerOpen ? '0' : '0.5rem'
       }}>
-        <Editor 
-          apiKey={process.env.REACT_APP_TINYMCE_API_KEY} 
-          onInit={(evt, editor) => editorRef.current = editor}
+        <ReactQuill 
+          ref={quillRef}
           value={documentContent}
-          onEditorChange={handleEditorChange}
-          init={{
-            height: '100%',
-            menubar: false,
-            plugins: [
-              'advlist autolink lists link image',
-              'searchreplace visualblocks code fullscreen',
-              'insertdatetime media table paste code help wordcount'
-            ],
-            toolbar: 'undo redo | formatselect | ' +
-              'bold italic backcolor | alignleft aligncenter ' +
-              'alignright alignjustify | bullist numlist outdent indent | ' +
-              'removeformat',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
-            mobile: {
-              theme: 'mobile',
-              plugins: ['autosave', 'lists', 'autolink'],
-              toolbar: ['undo', 'bold', 'italic', 'styleselect', 'bullist', 'numlist']
-            }
-          }}
+          onChange={handleEditorChange}
+          modules={modules}
+          formats={formats}
+          style={{ height: '100%' }}
         />
       </main>
 
@@ -323,16 +320,15 @@ const DocumentCreate = ({ documentId }) => {
           background: 'white', 
           padding: '1rem', 
           zIndex: 10, 
-          
         }}>
           <span onClick={toggleMenu} className='top-2 text-left text-xl cursor-pointer'>X</span>
           <button onClick={handleBackButtonClick} className='' style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <ArrowLeft size={18} style={{ marginRight: '0.5rem' }} /> Back to Documents
           </button>
-          <button onClick={() => editorRef.current?.execCommand('Undo')} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <button onClick={() => quillRef.current?.getEditor().history.undo()} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <Undo size={18} style={{ marginRight: '0.5rem' }} /> Undo
           </button>
-          <button onClick={() => editorRef.current?.execCommand('Redo')} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+          <button onClick={() => quillRef.current?.getEditor().history.redo()} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <Redo size={18} style={{ marginRight: '0.5rem' }} /> Redo
           </button>
           {/* ... Add other menu items as needed ... */}
@@ -397,8 +393,3 @@ DocumentCreate.propTypes = {
 };
 
 export default DocumentCreate;
-
-
-
-
-
