@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(512.5% 103.78% at 50% 50%, #FCA4B0 0%, #E6E0FE 54%, #B7F1FD 100%);
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  position: relative;
+}

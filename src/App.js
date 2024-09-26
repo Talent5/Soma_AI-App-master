@@ -16,6 +16,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import { SplashScreen } from './components/SplashScreen';
 import {Root} from './pages/Root'
 import { Content } from './pages/Content';
+import { ThemeProvider } from '@material-tailwind/react';
 import { AuthRouter } from './components/AuthRouter'; // New import
 import { Onboarding1 } from './components/Onboarding/Onboarding1';
 import { Onboarding2 } from './pages/Onboarding2';
@@ -49,9 +50,12 @@ import DocumentCreate from './components/Documents/DocumentCreate';
 import {ApplicationsPage} from './pages/ApplicationsPage';
 import { NavBar } from './components/NavBar';
 import { ScholarshipsPage } from './pages/ScholarshipsPage'
+// import { DocumentDetail } from './components/DocumentCreate/DocumentDetail';
 import ScholarshipDetail  from './pages/ScholarshipDetail';
+// import {Docs} from './components/DocumentCreate/Docs'
 import MobileCheckMessage from './MobileCheckMessage';
 import { DocumentPage } from './pages/DocumentPage';
+import '@material-tailwind/react'
 import AllRoutes from './routes/AllRoutes';
 import './global.css';
 import './styleguide.css';
@@ -160,62 +164,67 @@ function App() {
     '/field-of-study',
     '/extracurricular-activities',
     '/financial-information',
-    '/not-supported'
+    '/not-supported',
+    '/docs'
   ].includes(location.pathname);
 
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <AudioProvider>
         <ProgressProvider>
-          <MobileCheckMessage />
-          {showSplash ? (
-            <SplashScreen />
-          ) : (
-            <FormDataProvider>
-              <RouteEffects />
-              {shouldShowNavbar && <NavBar location={location} />}
-              <Routes>
-                <Route path="/" element={<Content />} />
-                <Route path="/singup" element={<Content />} />
-                <Route path="/onboarding1" element={<Onboarding1 />} />
-                <Route path="/onboarding2" element={<Onboarding2 />} />
-                <Route path="/onboarding3" element={<Onboarding3 />} />
-                <Route path="/onboarding4" element={<Onboarding4 />} />
-                <Route path="/onboarding5" element={<Onboarding5 />} />
-                <Route path="/onboarding6" element={<Onboarding6 />} />
-                <Route path="/onboarding7" element={<Onboarding7 />} />
-                <Route path="/onboarding8" element={<Onboarding8 />} />
-                <Route path="/onboarding9" element={<Onboarding9 />} />
-                <Route path="/onboarding10" element={<Onboarding10 />} />
-                <Route path="/onboarding11" element={<Onboarding11 />} />
-                <Route path="/onboarding12" element={<Onboarding12 />} />
-                <Route path="/onboarding13" element={<Onboarding13 />} />
-                <Route path="/onboarding14" element={<Onboarding14 />} />
-                <Route path="/onboarding15" element={<Onboarding15 />} />
-                <Route path="/onboarding16" element={<Onboarding16 />} />
-                <Route path="/onboarding17" element={<Onboarding17 />} />
-                <Route path="/onboarding18" element={<Onboarding18 />} />
-                <Route path="/onboarding19" element={<Onboarding19 />} />
-                <Route path="/onboarding20" element={<Onboarding20 />} />
-                <Route path="/onboarding21" element={<Onboarding21 />} />
-                <Route path="/onboarding22" element={<Onboarding22 />} />
-                <Route path="/onboarding23" element={<Onboarding23 />} />
-                <Route path="/onboarding24" element={<Onboarding24 />} />
-                <Route path="/onboarding25" element={<Onboarding25 />} />
-                <Route path="/onboarding26" element={<Onboarding26 />} />
-                <Route path="/onboarding27" element={<Onboarding27 />} />
-                <Route path="/review-edit" element={<ReviewAndEdit />} />
-                <Route path="/home" element={<Root />} />
-                <Route path="/Scholarships" element={<ScholarshipsPage />} />
-                <Route path="/scholarship/:id" element={<ScholarshipDetail />} /> 
-                <Route path="/documents" element={<DocumentPage />} />
-                <Route path="/applications" element={<ApplicationsPage />} />
-                <Route path="/create" element={<DocumentCreate />} />
-                <Route path="*" element={<AllRoutes />} />
+          <ThemeProvider> {/* Material Tailwind ThemeProvider */}
+            <MobileCheckMessage />
+            {showSplash ? (
+              <SplashScreen />
+            ) : (
+              <FormDataProvider>
+                <RouteEffects />
+                {shouldShowNavbar && <NavBar location={location} />}
+                <Routes>
+                  <Route path="/" element={<Content />} />
+                  <Route path="/singup" element={<Content />} />
+                  <Route path="/onboarding1" element={<Onboarding1 />} />
+                  <Route path="/onboarding2" element={<Onboarding2 />} />
+                  <Route path="/onboarding3" element={<Onboarding3 />} />
+                  <Route path="/onboarding4" element={<Onboarding4 />} />
+                  <Route path="/onboarding5" element={<Onboarding5 />} />
+                  <Route path="/onboarding6" element={<Onboarding6 />} />
+                  <Route path="/onboarding7" element={<Onboarding7 />} />
+                  <Route path="/onboarding8" element={<Onboarding8 />} />
+                  <Route path="/onboarding9" element={<Onboarding9 />} />
+                  <Route path="/onboarding10" element={<Onboarding10 />} />
+                  <Route path="/onboarding11" element={<Onboarding11 />} />
+                  <Route path="/onboarding12" element={<Onboarding12 />} />
+                  <Route path="/onboarding13" element={<Onboarding13 />} />
+                  <Route path="/onboarding14" element={<Onboarding14 />} />
+                  <Route path="/onboarding15" element={<Onboarding15 />} />
+                  <Route path="/onboarding16" element={<Onboarding16 />} />
+                  <Route path="/onboarding17" element={<Onboarding17 />} />
+                  <Route path="/onboarding18" element={<Onboarding18 />} />
+                  <Route path="/onboarding19" element={<Onboarding19 />} />
+                  <Route path="/onboarding20" element={<Onboarding20 />} />
+                  <Route path="/onboarding21" element={<Onboarding21 />} />
+                  <Route path="/onboarding22" element={<Onboarding22 />} />
+                  <Route path="/onboarding23" element={<Onboarding23 />} />
+                  <Route path="/onboarding24" element={<Onboarding24 />} />
+                  <Route path="/onboarding25" element={<Onboarding25 />} />
+                  <Route path="/onboarding26" element={<Onboarding26 />} />
+                  <Route path="/onboarding27" element={<Onboarding27 />} />
+                  <Route path="/review-edit" element={<ReviewAndEdit />} />
+                  <Route path="/home" element={<Root />} />
+                  <Route path="/Scholarships" element={<ScholarshipsPage />} />
+                  <Route path="/scholarship/:id" element={<ScholarshipDetail />} /> 
+                  <Route path="/documents" element={<DocumentPage />} />
+                  <Route path="/applications" element={<ApplicationsPage />} />
+                  <Route path="/create" element={<DocumentCreate />} />
+                  <Route path="*" element={<AllRoutes />} />
+                  {/* <Route path = "/docs" element = {<Docs/>} />
+                  <Route path="/doc/:id" element={<DocumentDetail />} /> */}
 
-              </Routes>
-            </FormDataProvider>
-          )}
+                </Routes>
+              </FormDataProvider>
+            )}
+          </ThemeProvider>
         </ProgressProvider>
       </AudioProvider>
     </GoogleOAuthProvider>

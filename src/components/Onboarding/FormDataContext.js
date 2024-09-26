@@ -1,8 +1,10 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../config/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useSignupProfileTrigger } from '../useSignupProfileTrigger'; // Make sure you have this hook
 
 export const FormDataContext = createContext();
 
@@ -28,13 +30,13 @@ const initialFormState = {
   gpa: '',
   educationLevel: '',
   preferredLocation: '',
-  cv: null,
+  cv: null, 
 };
 
 export const FormDataProvider = ({ children }) => {
   const [formData, setFormData] = useState(() => {
     const storedData = localStorage.getItem('formData');
-    const userId = localStorage.getItem('userId');  // Fetch userId from localStorage
+    const userId = localStorage.getItem('userId');
 
     if (storedData) {
       try {
@@ -42,18 +44,33 @@ export const FormDataProvider = ({ children }) => {
         return {
           ...initialFormState,
           ...parsedData,
-          userId: userId || '',  // Use localStorage userId if present
+          userId: userId || '',
         };
       } catch (error) {
         console.error('Error parsing stored form data:', error);
-        return { ...initialFormState, userId: userId || '' };  // Ensure userId is always populated
+        return { ...initialFormState, userId: userId || '' };
       }
     }
 
-    return { ...initialFormState, userId: userId || '' };  // Ensure userId is populated in the initial state
+    return { ...initialFormState, userId: userId || '' };
   });
 
-  // Ensure userId is always taken from localStorage
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   useEffect(() => {
     const storedUserId = localStorage.getItem('userId');
     if (storedUserId && storedUserId !== formData.userId) {
@@ -80,6 +97,26 @@ export const FormDataProvider = ({ children }) => {
     }));
   }, []);
 
+  const { signupFormRef, profileFormRefs } = useSignupProfileTrigger();
+
+  const triggerModelRun = async () => {
+          try {
+              const response = await fetch('https://somaai-ae50218ae5c5.herokuapp.com/run', {
+                  method: 'GET',
+              });
+
+              if (!response.ok) {
+                  throw new Error('Failed to trigger model run');
+              }
+
+              const result = await response.json();
+              console.log("Model triggered successfully:", result);
+          } catch (error) {
+              console.error('Error triggering model:', error);
+          }
+      };
+
+
   const submitFormData = useCallback(async () => {
     const storage = getStorage();
     let cvDownloadURL = null;
@@ -90,7 +127,6 @@ export const FormDataProvider = ({ children }) => {
         throw new Error('User ID is missing. Please try again.');
       }
 
-      // Upload CV if present
       if (formData.cv) {
         const fileName = formData.cv.name || 'default_cv_name.pdf';
         const cvRef = ref(storage, `cvs/${userId}_${fileName}`);
@@ -98,14 +134,12 @@ export const FormDataProvider = ({ children }) => {
         cvDownloadURL = await getDownloadURL(cvRef);
       }
 
-      // Prepare data to store in Firestore
       const formDataToSave = {
         ...formData,
         userId,
         cv: cvDownloadURL || '',
       };
 
-      // Remove null/undefined values
       Object.keys(formDataToSave).forEach((key) => {
         if (formDataToSave[key] === null || formDataToSave[key] === undefined) {
           delete formDataToSave[key];
@@ -115,21 +149,21 @@ export const FormDataProvider = ({ children }) => {
       const docRef = doc(db, 'users', userId);
       await setDoc(docRef, formDataToSave, { merge: true });
 
-      console.log('Submission successful');
-      localStorage.removeItem('formData');
-      setFormData({ ...initialFormState, userId }); // Retain userId after submission
 
-      return { success: true };
+      console.log('Submission successful');
+      setFormData({ ...initialFormState, userId });
+
+      return { success: true }; 
     } catch (error) {
       console.error('Error submitting form data:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message }; 
     }
   }, [formData]);
 
+
   const resetFormData = useCallback(() => {
     const userId = localStorage.getItem('userId');
-    localStorage.removeItem('formData');
-    setFormData({ ...initialFormState, userId });  // Retain userId on reset
+    setFormData({ ...initialFormState, userId });
   }, []);
 
   const contextValue = useMemo(
@@ -138,13 +172,15 @@ export const FormDataProvider = ({ children }) => {
       updateFormData,
       submitFormData,
       resetFormData,
+      isOnline,
     }),
-    [formData, updateFormData, submitFormData, resetFormData]
+    [formData, updateFormData, submitFormData, resetFormData, isOnline]
   );
 
   return (
     <FormDataContext.Provider value={contextValue}>
       {children}
+      {isLoading && <div>Generating Recommendations...</div>} 
     </FormDataContext.Provider>
   );
 };

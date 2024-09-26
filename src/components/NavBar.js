@@ -14,7 +14,7 @@ export const NavBar = ({ className = "" }) => {
   }, [navigate]);
 
   return (
-    <div className={`navbar bg-slate-50 ${className}`}>
+    <div className={`navbar bg-white ${className}`}>
       <div 
         className={`navitem ${location.pathname === '/' ? 'active' : ''}`} 
         onClick={() => handleNavClick('/home')}
