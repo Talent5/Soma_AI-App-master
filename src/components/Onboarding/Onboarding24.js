@@ -12,9 +12,25 @@ export const Onboarding24 = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [isContinueClicked, setIsContinueClicked] = useState(false);
+  const [isModelTraining, setIsModelTraining] = useState(false);
 
   const handleInputChange = (e) => {
     setFinancialNeed(e.target.value);
+  };
+
+  const triggerModelRun = async () => {
+    try {
+      // Make the GET request to trigger the model run
+      const response = await fetch('https://somaai-ae50218ae5c5.herokuapp.com/run', { method: 'GET' });
+      if (!response.ok) {
+        throw new Error('Failed to trigger model run');
+      }
+      const result = await response.json();
+      console.log('Model triggered successfully:', result);
+    } catch (err) {
+      console.error('Error triggering model:', err);
+      setError('Error during model run');
+    }
   };
 
   const handleSubmit = useCallback(async () => {
@@ -26,7 +42,16 @@ export const Onboarding24 = () => {
         throw new Error(error || 'Failed to submit form data');
       }
       console.log('Form data submitted successfully');
-      navigate('/home');
+
+      // Trigger model run and display loading spinner for 5-10 seconds
+      setIsModelTraining(true);
+      await triggerModelRun();
+
+      // Simulate model training for 5-10 seconds (set to 7 seconds in this case)
+      setTimeout(() => {
+        setIsModelTraining(false);
+        navigate('/Home');  // Navigate to the dashboard
+      }, 7000);  // 7 seconds for simulation
     } catch (err) {
       console.error('Error submitting form data:', err);
       setError(err.message || 'An unexpected error occurred');
@@ -79,11 +104,18 @@ export const Onboarding24 = () => {
         </label>
       </div>
       {error && <p className="error-message">{error}</p>}
-      {isContinueClicked ? (
+
+      {isModelTraining ? (
+        <div className="model-training-spinner">
+          {/* Loading animation for model training */}
+          <div className="loading-spinner"></div>
+          <p>Model is training, please wait...</p>
+        </div>
+      ) : isContinueClicked ? (
         <button
           className={`continue-button submit-button ${isSubmitting ? 'submitting' : ''}`}
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={isSubmitting || isModelTraining}
         >
           {isSubmitting ? (
             <div className="spinner-container">
