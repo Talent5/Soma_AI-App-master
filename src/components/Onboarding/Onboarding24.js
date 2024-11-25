@@ -50,7 +50,7 @@ export const Onboarding24 = () => {
       // Simulate model training for 5-10 seconds (set to 7 seconds in this case)
       setTimeout(() => {
         setIsModelTraining(false);
-        navigate('/Home');  // Navigate to the dashboard
+        navigate('/home');  // Navigate to the dashboard
       }, 7000);  // 7 seconds for simulation
     } catch (err) {
       console.error('Error submitting form data:', err);
