@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { setDoc, doc, getDoc, collection, addDoc, getDocs } from 'firebase/firestore';
 import PropTypes from 'prop-types';
